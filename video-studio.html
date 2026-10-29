@@ -1183,17 +1183,7 @@
     }, 4600);
   }
 
-  /* ============================================================
-     GOOGLE AUTH PLACEHOLDER
-     ============================================================ */
-  $$('[data-auth]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      showToast(
-        'Google Sign-In is not connected yet. Authentication will be enabled ' +
-        'once Firebase Authentication is configured.'
-      );
-    });
-  });
+  /* Google auth is handled by the Firebase module below. */
 
   /* ============================================================
      VIDEO STUDIO — CONFIG
@@ -1785,6 +1775,104 @@
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 })();
+</script>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+  // Replace these placeholders with the config from Firebase Console.
+  const firebaseConfig = {
+     apiKey: "AIzaSyC3WkLoBnr0Uwi05Y9MObDH_yGNz5yjQUE",
+    authDomain: "aavora-53900.firebaseapp.com",
+    projectId: "aavora-53900",
+    storageBucket: "aavora-53900.firebasestorage.app",
+    messagingSenderId: "250774635360",
+    appId: "1:250774635360:web:0b7cdf6d7b13ced0151405"
+  };
+
+  const authButtons = Array.from(document.querySelectorAll("[data-auth]"));
+  const toastEl = document.getElementById("toast");
+  let toastTimer;
+
+  function showAuthToast(message) {
+    if (!toastEl) return;
+    toastEl.textContent = message;
+    toastEl.classList.add("is-visible");
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toastEl.classList.remove("is-visible"), 4600);
+  }
+
+  function configIsReady() {
+    return !Object.values(firebaseConfig).some(value =>
+      typeof value !== "string" || value.includes("PASTE_YOUR_")
+    );
+  }
+
+  if (!authButtons.length) {
+    console.warn("Aavora Firebase Auth: no [data-auth] buttons found.");
+  } else if (!configIsReady()) {
+    authButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        showAuthToast("Firebase config missing. Add your Firebase web app config first.");
+      });
+    });
+    console.warn("Aavora Firebase Auth: replace the firebaseConfig placeholders.");
+  } else {
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      authButtons.forEach(button => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            if (auth.currentUser) {
+              await signOut(auth);
+              showAuthToast("You have signed out.");
+            } else {
+              await signInWithPopup(auth, provider);
+            }
+          } catch (error) {
+            console.error("Aavora Google sign-in error:", error);
+            const messages = {
+              "auth/unauthorized-domain": "This domain is not authorized in Firebase Authentication.",
+              "auth/popup-blocked": "Your browser blocked the sign-in popup. Allow popups and try again.",
+              "auth/popup-closed-by-user": "Sign-in window was closed before completing login.",
+              "auth/network-request-failed": "Network error. Check your internet and try again."
+            };
+            showAuthToast(messages[error.code] || ("Google sign-in failed: " + (error.message || error.code)));
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+
+      onAuthStateChanged(auth, user => {
+        authButtons.forEach(button => {
+          const label = button.querySelector("span");
+          if (label) {
+            label.textContent = user
+              ? "Sign out (" + (user.displayName || user.email || "account") + ")"
+              : "Sign in with Google";
+          }
+          button.setAttribute("aria-label", user ? "Sign out of Google account" : "Sign in with Google");
+        });
+      });
+    } catch (error) {
+      console.error("Aavora Firebase initialization error:", error);
+      showAuthToast("Firebase could not initialize. Check your Firebase web config.");
+    }
+  }
 </script>
 
 </body>
