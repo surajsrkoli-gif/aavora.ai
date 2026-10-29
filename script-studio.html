@@ -1043,17 +1043,7 @@
     }, 4600);
   }
 
-  /* ============================================================
-     GOOGLE AUTH PLACEHOLDER
-     ============================================================ */
-  $$('[data-auth]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      showToast(
-        'Google Sign-In is not connected yet. Authentication will be enabled ' +
-        'once Firebase Authentication is configured.'
-      );
-    });
-  });
+  /* Google authentication is wired in the Firebase module below. */
 
   /* ============================================================
      SCRIPT STUDIO — CONFIG
@@ -1602,6 +1592,88 @@
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 })();
+</script>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+  // IMPORTANT: Copy the SAME working Firebase config from your index.html.
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3WkLoBnr0Uwi05Y9MObDH_yGNz5yjQUE",
+    authDomain: "aavora-53900.firebaseapp.com",
+    projectId: "aavora-53900",
+    storageBucket: "aavora-53900.firebasestorage.app",
+    messagingSenderId: "250774635360",
+    appId: "1:250774635360:web:0b7cdf6d7b13ced0151405"
+  };
+
+  const authButtons = Array.from(document.querySelectorAll("[data-auth]"));
+  const toast = document.getElementById("toast");
+  let toastTimer;
+
+  function notify(message) {
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 4600);
+  }
+
+  function configIsPlaceholder() {
+    return Object.values(firebaseConfig).some(value => String(value).includes("PASTE_YOUR"));
+  }
+
+  if (configIsPlaceholder()) {
+    authButtons.forEach(button => button.addEventListener("click", () => {
+      notify("Firebase config add karo: index.html se same config values copy karo.");
+    }));
+    console.warn("Aavora.art: Replace the placeholder Firebase config with the working config from index.html.");
+  } else {
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+
+      authButtons.forEach(button => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            if (auth.currentUser) {
+              await signOut(auth);
+              notify("You have signed out.");
+            } else {
+              await signInWithPopup(auth, provider);
+              notify("Google login successful.");
+            }
+          } catch (error) {
+            console.error("Firebase auth error:", error);
+            const messages = {
+              "auth/unauthorized-domain": "Firebase Console mein aavora.art authorized domain add karo.",
+              "auth/popup-blocked": "Browser popup block kar raha hai. Popup allow karke dobara try karo.",
+              "auth/popup-closed-by-user": "Login window band ho gayi. Dobara try karo."
+            };
+            notify(messages[error.code] || "Google login nahi ho paya. Internet aur Firebase config check karo.");
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+
+      onAuthStateChanged(auth, user => {
+        authButtons.forEach(button => {
+          const label = button.querySelector("span");
+          if (label) label.textContent = user ? `Sign out (${user.displayName || user.email || "account"})` : "Sign in with Google";
+          button.setAttribute("aria-label", user ? "Sign out of Google account" : "Sign in with Google");
+        });
+      });
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+      notify("Firebase initialize nahi hua. Config check karo.");
+    }
+  }
 </script>
 
 </body>
