@@ -1,1079 +1,1167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Aavora.art — premium free AI creation tools: text to image, upscalers, background remover, text to video, design generators and prompting utilities. Instant results, no signup, futuristic UI.">
-  <meta name="keywords" content="AI art generator, text to image, image upscaler, background remover, text to video, logo maker, prompt generator, free AI tools">
-  <meta name="author" content="Aavora.art">
-  <link rel="canonical" href="https://aavora.art/">
-  <meta property="og:title" content="Aavora.art | Futuristic Free AI Creation Tools">
-  <meta property="og:description" content="Beautiful, fast AI tools for artists and designers. 100% free, mobile-optimized, no signup.">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <title>Aavora.art – Premium Free AI Creation Tools</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Aavora.art — Your Ideas. Your Stories. Your Visuals.</title>
+<meta name="description" content="Aavora.art is one creative space to write stories, generate cinematic videos, and create stunning images with AI." />
+<meta name="theme-color" content="#F7F7F4" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     TOKENS
+     ============================================================ */
+  :root{
+    --bg:#F7F7F4;
+    --tint:#F1F3EE;
+    --surface:#FFFFFF;
+    --ink:#0D1411;
+    --ink-soft:#38423C;
+    --muted:#6C7A72;
+    --line:#E3E6DF;
+    --line-strong:#CFD6CD;
+    --emerald:#0F9D6B;
+    --emerald-deep:#0B7A54;
+    --emerald-tint:#E7F4ED;
+    --radius-lg:22px;
+    --radius:16px;
+    --shadow-sm:0 1px 2px rgba(13,20,17,.04), 0 10px 26px -20px rgba(13,20,17,.35);
+    --shadow-md:0 30px 60px -42px rgba(13,20,17,.55);
+    --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
 
-    body {
-      background: #08080C;
-      color: #F5F5FA;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.5;
-      scroll-behavior: smooth;
-      overflow-x: hidden;
-    }
+  /* ============================================================
+     BASE
+     ============================================================ */
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  h1,h2,h3{margin:0;font-weight:600;line-height:1.12;letter-spacing:-.028em}
+  p{margin:0}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  img,svg{display:block;max-width:100%}
+  ul,ol{margin:0;padding:0;list-style:none}
+  ::selection{background:rgba(15,157,107,.22);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--emerald);outline-offset:3px;border-radius:8px}
 
-    html {
-      scroll-padding-top: 90px;
-    }
+  .shell{width:min(100% - 48px,1160px);margin-inline:auto}
 
-    /* Glassmorphism Core */
-    .glass-card, .navbar, .prompt-panel, .search-bar, .card, .faq-item, .badge {
-      background: rgba(22, 22, 34, 0.45);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(139, 92, 246, 0.22);
-      border-radius: 32px;
-    }
+  /* ============================================================
+     BUTTONS
+     ============================================================ */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    font-size:.9rem;font-weight:600;line-height:1;
+    padding:13px 20px;border-radius:12px;border:1px solid transparent;
+    white-space:nowrap;cursor:pointer;
+    transition:transform .18s ease, background .2s ease, border-color .2s ease, box-shadow .25s ease, color .2s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{
+    background:var(--emerald-deep);color:#fff;
+    box-shadow:0 12px 24px -16px rgba(11,122,84,.95);
+  }
+  .btn-primary:hover{
+    background:#0a6b4a;transform:translateY(-2px);
+    box-shadow:0 18px 30px -18px rgba(11,122,84,1);
+  }
+  .btn-ghost{
+    background:var(--surface);border-color:var(--line);color:var(--ink);
+    box-shadow:var(--shadow-sm);
+  }
+  .btn-ghost:hover{transform:translateY(-2px);border-color:var(--line-strong)}
+  .btn-google{
+    background:var(--surface);border-color:var(--line);color:var(--ink);
+    font-weight:500;padding:11px 16px;box-shadow:var(--shadow-sm);
+  }
+  .btn-google:hover{transform:translateY(-1px);box-shadow:0 14px 24px -18px rgba(13,20,17,.7)}
+  .btn-google svg{width:16px;height:16px;flex:none}
+  .btn-block{width:100%}
+  .btn svg.arrow{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 32px;
-    }
+  /* ============================================================
+     HEADER / NAV
+     ============================================================ */
+  .site-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(247,247,244,.82);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .site-header.is-scrolled{
+    border-bottom-color:var(--line);
+    box-shadow:0 18px 30px -30px rgba(13,20,17,.6);
+  }
+  .nav-shell{display:flex;align-items:center;justify-content:space-between;gap:22px;height:70px}
 
-    /* ========== NAVBAR ========== */
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(8, 8, 12, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(139, 92, 246, 0.3);
-      border-radius: 0;
-      transition: all 0.3s ease;
-    }
-    .nav-container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      padding: 16px 0;
-      position: relative;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      background: linear-gradient(135deg, #F5F5FA, #8B5CF6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-decoration: none;
-    }
-    .logo-mark {
-      width: 22px;
-      height: 22px;
-      border-radius: 7px;
-      flex: none;
-      background: conic-gradient(from 200deg, #8B5CF6, #EC4899, #22D3EE, #8B5CF6);
-      box-shadow: 0 0 18px rgba(139, 92, 246, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
-    }
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      align-items: center;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .nav-links a {
-      color: #DADAE6;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.2s, transform 0.2s;
-    }
-    .nav-links a:hover {
-      color: #A78BFA;
-      transform: translateY(-2px);
-    }
-    .nav-cta {
-      margin-left: auto;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #8B5CF6, #6366F1 48%, #22D3EE);
-      border: none;
-      padding: 10px 28px;
-      border-radius: 40px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);
-    }
-    .btn-primary:hover {
-      transform: scale(0.96);
-      box-shadow: 0 8px 22px rgba(139, 92, 246, 0.5);
-    }
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #A78BFA;
-      color: #C4B5FD;
-      padding: 10px 24px;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn-outline:hover {
-      background: rgba(139, 92, 246, 0.12);
-      transform: translateY(-2px);
-    }
-    .mobile-menu {
-      display: none;
-      font-size: 28px;
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      line-height: 1;
-    }
+  .brand{display:inline-flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:600;letter-spacing:-.03em}
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(145deg,#12b981,#0B7A54);
+    box-shadow:0 8px 16px -10px rgba(15,157,107,1), inset 0 0 0 1px rgba(255,255,255,.22);
+  }
+  .brand-mark svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .brand-dot{color:var(--emerald)}
 
-    /* ========== HERO ========== */
-    .hero {
-      padding: 90px 0 70px;
-      position: relative;
-      text-align: center;
-    }
-    .hero-glow {
-      position: absolute;
-      width: 640px;
-      height: 640px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.28), transparent 68%);
-      filter: blur(70px);
-      top: -160px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 0;
-      pointer-events: none;
-    }
-    .hero > * {
-      position: relative;
-      z-index: 1;
-    }
-    h1 {
-      font-size: clamp(2.6rem, 7vw, 4.6rem);
-      font-weight: 800;
-      letter-spacing: -0.035em;
-      line-height: 1.05;
-      background: linear-gradient(135deg, #FFFFFF 20%, #A78BFA 60%, #22D3EE 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 24px;
-    }
-    .hero-sub {
-      font-size: 1.22rem;
-      max-width: 700px;
-      margin: 0 auto 32px;
-      color: #B6B6C8;
-    }
-    .hero-buttons {
-      display: flex;
-      gap: 18px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 40px;
-    }
-    .trust-badge {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .badge {
-      padding: 8px 22px;
-      background: rgba(22, 22, 34, 0.7);
-      border-radius: 60px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #DADAE6;
-    }
+  .nav-links{display:flex;align-items:center;gap:2px}
+  .nav-links a{
+    font-size:.9rem;font-weight:500;color:var(--ink-soft);
+    padding:9px 15px;border-radius:999px;
+    transition:color .2s ease, background .2s ease;
+  }
+  .nav-links a:hover{color:var(--ink);background:rgba(13,20,17,.05)}
+  .nav-links a.is-active{color:var(--emerald-deep);background:var(--emerald-tint)}
 
-    /* ========== LIVE PROMPT STUDIO PANEL ========== */
-    .prompt-panel {
-      max-width: 620px;
-      margin: 40px auto 0;
-      padding: 26px;
-      border-radius: 32px;
-    }
-    .panel-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 16px;
-      font-size: 0.82rem;
-    }
-    .panel-title {
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: #F5F5FA;
-    }
-    .panel-status {
-      color: #A78BFA;
-      font-size: 0.78rem;
-      font-weight: 500;
-      text-align: right;
-    }
-    .prompt-form {
-      display: flex;
-      gap: 10px;
-    }
-    .prompt-form input {
-      flex: 1;
-      min-width: 0;
-      background: #08080C;
-      border: 1px solid rgba(139, 92, 246, 0.35);
-      border-radius: 28px;
-      padding: 14px 20px;
-      color: #F5F5FA;
-      font-family: inherit;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-    .prompt-form input::placeholder {
-      color: #6E6E85;
-    }
-    .prompt-form input:focus {
-      border-color: #A78BFA;
-      box-shadow: 0 0 14px rgba(139, 92, 246, 0.3);
-    }
-    .prompt-form .btn-primary {
-      padding: 14px 26px;
-      border-radius: 28px;
-      flex: none;
-    }
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 14px;
-    }
-    .chip {
-      font-family: inherit;
-      font-size: 0.76rem;
-      font-weight: 500;
-      color: #B6B6C8;
-      background: rgba(255, 255, 255, 0.045);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 7px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .chip:hover {
-      color: #fff;
-      background: rgba(139, 92, 246, 0.22);
-      border-color: rgba(139, 92, 246, 0.5);
-      transform: translateY(-1px);
-    }
-    .studio-output {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .tile {
-      position: relative;
-      aspect-ratio: 1 / 1;
-      border-radius: 22px;
-      overflow: hidden;
-      background: #14141F;
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1), box-shadow 0.35s;
-    }
-    .tile:hover {
-      transform: translateY(-3px) scale(1.015);
-      box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
-    }
-    .tile.loading::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      background: linear-gradient(100deg, transparent 18%, rgba(255, 255, 255, 0.14) 50%, transparent 82%);
-      background-size: 220% 100%;
-      animation: shimmer 1.1s linear infinite;
-    }
-    .tile.loading::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      background: rgba(8, 8, 12, 0.55);
-    }
-    @keyframes shimmer {
-      from { background-position: 180% 0; }
-      to { background-position: -80% 0; }
-    }
-    .panel-foot {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      font-size: 0.74rem;
-      color: #8A8AA0;
-    }
-    .panel-foot .dot {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #8B5CF6;
-      box-shadow: 0 0 10px #8B5CF6;
-      margin-right: 7px;
-    }
+  .nav-actions{display:flex;align-items:center;gap:10px}
 
-    /* ========== SEARCH ========== */
-    .search-section {
-      margin: 70px 0 50px;
-    }
-    .search-bar {
-      width: 100%;
-      padding: 18px 28px;
-      font-family: inherit;
-      font-size: 1.05rem;
-      background: rgba(22, 22, 34, 0.8);
-      border: 1px solid rgba(139, 92, 246, 0.5);
-      border-radius: 60px;
-      color: white;
-      outline: none;
-      transition: all 0.2s;
-    }
-    .search-bar::placeholder {
-      color: #7A7A92;
-    }
-    .search-bar:focus {
-      border-color: #A78BFA;
-      box-shadow: 0 0 14px rgba(139, 92, 246, 0.3);
-    }
-    #searchStatus {
-      margin-top: 14px;
-      font-size: 0.85rem;
-      color: #A78BFA;
-      text-align: center;
-      min-height: 1.2em;
-    }
+  .nav-toggle{
+    display:none;width:40px;height:40px;border-radius:11px;
+    border:1px solid var(--line);background:var(--surface);
+    align-items:center;justify-content:center;
+  }
+  .nav-toggle span{position:relative;display:block;width:16px;height:1.6px;border-radius:2px;background:var(--ink);transition:background .2s ease}
+  .nav-toggle span::before,.nav-toggle span::after{
+    content:"";position:absolute;left:0;width:16px;height:1.6px;border-radius:2px;background:var(--ink);
+    transition:transform .25s ease;
+  }
+  .nav-toggle span::before{top:-5px}
+  .nav-toggle span::after{top:5px}
+  .nav-toggle[aria-expanded="true"] span{background:transparent}
+  .nav-toggle[aria-expanded="true"] span::before{transform:translateY(5px) rotate(45deg)}
+  .nav-toggle[aria-expanded="true"] span::after{transform:translateY(-5px) rotate(-45deg)}
 
-    /* ========== CARDS ========== */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 28px;
-      margin-top: 36px;
-    }
-    .card {
-      padding: 26px;
-      background: rgba(22, 22, 34, 0.5);
-      border-radius: 32px;
-      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    .card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(139, 92, 246, 0.7);
-      box-shadow: 0 25px 35px -12px rgba(139, 92, 246, 0.28);
-    }
-    .card-icon {
-      font-size: 2.2rem;
-      margin-bottom: 16px;
-      line-height: 1;
-    }
-    .card h3 {
-      font-size: 1.28rem;
-      margin-bottom: 10px;
-      letter-spacing: -0.015em;
-    }
-    .card p {
-      color: #A8A8BC;
-      font-size: 0.93rem;
-    }
-    .tool-btn {
-      display: block;
-      margin-top: 22px;
-      background: linear-gradient(135deg, #8B5CF6, #6366F1);
-      padding: 12px 0;
-      border-radius: 40px;
-      text-decoration: none;
-      color: white;
-      font-weight: 600;
-      font-size: 0.92rem;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .tool-btn:hover {
-      background: linear-gradient(135deg, #A78BFA, #22D3EE);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px -10px rgba(139, 92, 246, 0.8);
-    }
-    .section-title {
-      font-size: 2.1rem;
-      margin-bottom: 16px;
-      letter-spacing: -0.03em;
-      background: linear-gradient(120deg, #F5F5FA, #A78BFA);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-    .section-header span {
-      font-size: 1.9rem;
-      line-height: 1;
-    }
+  .mobile-nav{
+    display:none;flex-direction:column;gap:2px;
+    padding:6px 24px 20px;
+    background:rgba(247,247,244,.99);
+    border-top:1px solid var(--line);
+  }
+  .mobile-nav.is-open{display:flex}
+  .mobile-nav a{
+    padding:13px 4px;font-size:.95rem;font-weight:500;color:var(--ink-soft);
+    border-bottom:1px solid rgba(13,20,17,.06);
+  }
+  .mobile-nav a.is-active{color:var(--emerald-deep)}
+  .mobile-nav .btn{margin-top:14px}
 
-    /* ========== WHY US ========== */
-    .why-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 28px;
-      margin: 40px 0 0;
-    }
+  /* ============================================================
+     VIEWS
+     ============================================================ */
+  .view{display:none}
+  .view.is-active{display:block;animation:viewIn .4s cubic-bezier(.2,.7,.3,1) both}
+  @keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-    /* ========== FAQ ========== */
-    .faq-item {
-      margin-bottom: 16px;
-      padding: 18px 26px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .faq-item:hover {
-      border-color: rgba(139, 92, 246, 0.45);
-    }
-    .faq-question {
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      font-size: 1.02rem;
-    }
-    .faq-question span {
-      color: #A78BFA;
-      flex: none;
-      font-weight: 400;
-    }
-    .faq-answer {
-      display: none;
-      margin-top: 14px;
-      color: #A8A8BC;
-      font-size: 0.94rem;
-    }
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero{padding:66px 0 76px;position:relative;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center}
 
-    /* ========== FOOTER ========== */
-    footer {
-      margin-top: 100px;
-      background: #06060A;
-      border-top: 1px solid rgba(139, 92, 246, 0.2);
-      padding: 60px 0 30px;
-    }
-    .footer-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 44px;
-      margin-bottom: 50px;
-    }
-    .footer-col h4 {
-      font-size: 1.1rem;
-      margin-bottom: 20px;
-      color: #F5F5FA;
-      letter-spacing: -0.01em;
-    }
-    .footer-col p, .footer-col a {
-      color: #8E8EA6;
-      text-decoration: none;
-      display: block;
-      margin-bottom: 12px;
-      font-size: 0.92rem;
-      transition: color 0.2s;
-    }
-    .footer-col a:hover {
-      color: #A78BFA;
-    }
-    .footer-bottom {
-      text-align: center;
-      padding-top: 30px;
-      border-top: 1px solid #1A1A26;
-      color: #5E5E76;
-      font-size: 0.87rem;
-    }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.74rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--emerald-deep);background:var(--emerald-tint);
+    border:1px solid rgba(15,157,107,.18);
+    padding:6px 12px;border-radius:999px;
+  }
+  .eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(15,157,107,.16)}
 
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 1024px) {
-      .nav-links {
-        position: static;
-        transform: none;
-        margin: 0 auto;
-        gap: 1.6rem;
-      }
-      .nav-container {
-        justify-content: space-between;
-      }
-      .nav-cta {
-        margin-left: 0;
-      }
+  .hero h1{font-size:clamp(2.45rem,5.1vw,3.95rem);margin:22px 0 18px;letter-spacing:-.042em}
+  .hero h1 em{
+    font-family:'Instrument Serif',Georgia,'Times New Roman',serif;
+    font-style:italic;font-weight:400;letter-spacing:-.01em;
+    color:var(--emerald-deep);
+  }
+  .hero-lede{color:var(--muted);font-size:1.06rem;max-width:50ch}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+
+  /* --- Hero visual composition --- */
+  .hero-visual{position:relative}
+  .visual-frame{
+    position:relative;aspect-ratio:1/.92;border-radius:28px;overflow:hidden;
+    border:1px solid var(--line);
+    background:linear-gradient(155deg,#FFFFFF 0%,#F2F6F1 55%,#E9F2EC 100%);
+    box-shadow:0 50px 90px -70px rgba(13,20,17,.85), 0 1px 0 #fff inset;
+  }
+  .visual-grid{
+    position:absolute;inset:0;
+    background-image:radial-gradient(rgba(13,20,17,.09) 1px, transparent 1px);
+    background-size:22px 22px;
+    -webkit-mask-image:radial-gradient(circle at 50% 45%, #000 10%, transparent 74%);
+    mask-image:radial-gradient(circle at 50% 45%, #000 10%, transparent 74%);
+  }
+  .visual-glow{
+    position:absolute;left:8%;top:-8%;width:78%;height:78%;
+    background:radial-gradient(circle at 50% 40%, rgba(15,157,107,.24), transparent 66%);
+    filter:blur(24px);pointer-events:none;
+  }
+  .visual-card{
+    position:absolute;background:var(--surface);
+    border:1px solid var(--line);border-radius:15px;
+    padding:12px 13px;display:flex;flex-direction:column;gap:9px;
+    box-shadow:0 24px 44px -32px rgba(13,20,17,.75);
+    will-change:transform;
+  }
+  .vc-label{font-size:.68rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+  .vc-script{width:54%;left:7%;top:14%;animation:float 9s ease-in-out infinite}
+  .vc-video{width:44%;right:7%;top:40%;animation:float 11s ease-in-out infinite .7s}
+  .vc-image{width:48%;left:15%;bottom:11%;animation:float 10s ease-in-out infinite 1.3s}
+
+  .vc-lines{display:flex;flex-direction:column;gap:6px}
+  .vc-lines i{display:block;height:6px;border-radius:3px;background:linear-gradient(90deg,#E4EBE5,#EFF3EF)}
+  .vc-lines i:nth-child(1){width:100%}
+  .vc-lines i:nth-child(2){width:84%}
+  .vc-lines i:nth-child(3){width:66%}
+  .vc-lines i:nth-child(4){width:90%}
+
+  .vc-play{
+    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:var(--emerald-deep);box-shadow:0 10px 20px -10px rgba(11,122,84,1);
+  }
+  .vc-play svg{width:12px;height:12px;fill:#fff}
+  .vc-timeline{position:relative;height:5px;border-radius:3px;background:#EAF0EB;overflow:hidden}
+  .vc-timeline::after{content:"";position:absolute;inset:0 45% 0 0;background:var(--emerald);border-radius:3px}
+
+  .vc-thumb{
+    height:62px;border-radius:10px;
+    background:
+      radial-gradient(circle at 24% 22%, rgba(255,255,255,.75), transparent 55%),
+      radial-gradient(circle at 78% 76%, rgba(167,243,208,.9), transparent 58%),
+      linear-gradient(140deg,#0F9D6B,#0B7A54);
+  }
+
+  @keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-10px)}
+  }
+
+  /* ============================================================
+     SECTION BASICS
+     ============================================================ */
+  .section{padding:78px 0}
+  .section-head{max-width:620px;margin-bottom:42px}
+  .section-head h2{font-size:clamp(1.6rem,3vw,2.25rem);margin:16px 0 12px}
+  .section-head p{color:var(--muted);font-size:1rem}
+
+  .section-tint{background:var(--tint);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+  /* ============================================================
+     STUDIO CARDS
+     ============================================================ */
+  .studio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .studio-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    overflow:hidden;display:flex;flex-direction:column;
+    transition:transform .32s cubic-bezier(.2,.7,.3,1), box-shadow .32s ease, border-color .3s ease;
+  }
+  .studio-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);border-color:var(--line-strong)}
+
+  .studio-preview{
+    position:relative;aspect-ratio:16/10;overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+
+  /* Script preview */
+  .preview-script{
+    background:linear-gradient(160deg,#F8FBF8,#EEF3EF);
+    display:grid;place-items:center;padding:22px;
+  }
+  .ps-paper{
+    width:80%;background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:16px 14px;display:flex;flex-direction:column;gap:8px;
+    box-shadow:0 16px 32px -26px rgba(13,20,17,.75);
+  }
+  .ps-line{display:block;height:6px;border-radius:3px;background:#E7EDE8}
+  .ps-line.w-90{width:90%}
+  .ps-line.w-72{width:72%}
+  .ps-line.w-82{width:82%}
+  .ps-line.w-54{width:54%;background:var(--emerald-tint)}
+  .ps-tag{
+    position:absolute;top:12px;left:12px;
+    font-size:.64rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--emerald-deep);background:rgba(255,255,255,.9);
+    border:1px solid rgba(15,157,107,.25);
+    padding:4px 9px;border-radius:999px;
+  }
+
+  /* Video preview */
+  .preview-video{
+    background:linear-gradient(150deg,#0E1A15,#12332A 58%,#0B7A54);
+    display:grid;place-items:center;
+  }
+  .pv-play{
+    width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    box-shadow:0 18px 30px -20px rgba(0,0,0,.9);
+  }
+  .pv-play svg{width:15px;height:15px;fill:#fff}
+  .pv-bar{position:absolute;left:16px;right:16px;bottom:14px;height:4px;border-radius:2px;background:rgba(255,255,255,.24)}
+  .pv-bar::after{content:"";position:absolute;inset:0 56% 0 0;background:#34D399;border-radius:2px}
+
+  /* Image preview */
+  .preview-image{
+    display:grid;place-items:center;
+    background:
+      radial-gradient(120% 120% at 16% 10%, rgba(52,211,153,.85), transparent 56%),
+      radial-gradient(110% 110% at 86% 84%, rgba(11,122,84,.95), transparent 60%),
+      linear-gradient(140deg,#D6EAE0,#EDF4EF);
+  }
+  .pi-orb{
+    width:46%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 34% 28%, #FFFFFF, #A7F3D0 44%, #0F9D6B 100%);
+    box-shadow:0 26px 46px -26px rgba(11,122,84,.9);
+    animation:float 8s ease-in-out infinite;
+  }
+
+  .studio-body{padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+  .studio-body h3{font-size:1.15rem}
+  .studio-body p{color:var(--muted);font-size:.94rem;flex:1}
+  .btn-card{
+    margin-top:8px;width:100%;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:var(--ink);color:#fff;font-size:.88rem;font-weight:600;
+    padding:13px 16px;border-radius:12px;
+    transition:background .22s ease, transform .18s ease, box-shadow .25s ease;
+  }
+  .btn-card:hover{background:var(--emerald-deep);transform:translateY(-1px);box-shadow:0 16px 26px -18px rgba(11,122,84,1)}
+
+  /* ============================================================
+     WORKFLOW
+     ============================================================ */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .step{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px 22px;box-shadow:var(--shadow-sm);
+  }
+  .step-num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:34px;height:34px;border-radius:10px;margin-bottom:16px;
+    background:var(--emerald-tint);color:var(--emerald-deep);
+    font-size:.76rem;font-weight:700;letter-spacing:.06em;
+  }
+  .step h3{font-size:1.02rem;margin-bottom:6px}
+  .step p{color:var(--muted);font-size:.92rem}
+
+  /* ============================================================
+     STUDIO VIEWS
+     ============================================================ */
+  .studio-shell{padding:40px 0 84px}
+  .back-link{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:.86rem;font-weight:500;color:var(--muted);
+    margin-bottom:26px;transition:color .2s ease;
+  }
+  .back-link:hover{color:var(--ink)}
+  .back-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  .studio-head{max-width:660px;margin-bottom:32px}
+  .studio-head h1{font-size:clamp(1.85rem,3.6vw,2.55rem);margin:16px 0 12px}
+  .studio-head p{color:var(--muted);font-size:1rem}
+
+  .workspace{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:22px;align-items:start}
+
+  .panel{
+    background:var(--surface);border:1px solid var(--line);border-radius:20px;
+    padding:22px;box-shadow:var(--shadow-sm);
+  }
+
+  .field{margin-bottom:16px}
+  .field:last-of-type{margin-bottom:0}
+  .field label{
+    display:block;margin-bottom:8px;
+    font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .field textarea,.field select{
+    width:100%;font:inherit;font-size:.94rem;color:var(--ink);
+    background:#FBFCFA;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;line-height:1.55;
+    transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .field textarea{min-height:118px;resize:vertical}
+  .field select{appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236C7A72' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+  }
+  .field textarea::placeholder{color:#9AA6A0}
+  .field textarea:focus,.field select:focus{
+    outline:none;border-color:var(--emerald);
+    box-shadow:0 0 0 4px rgba(15,157,107,.12);background:#fff;
+  }
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    font-size:.82rem;font-weight:500;color:var(--ink-soft);
+    background:#FBFCFA;border:1px solid var(--line);
+    padding:8px 14px;border-radius:999px;
+    transition:background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
+  }
+  .chip:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+  .chip.is-selected{
+    background:var(--emerald-tint);border-color:rgba(15,157,107,.42);color:var(--emerald-deep);
+  }
+
+  .panel-note{
+    font-size:.78rem;line-height:1.55;color:var(--muted);
+    margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+  }
+
+  .preview-panel{
+    background:var(--surface);border:1px solid var(--line);border-radius:20px;
+    padding:18px;min-height:360px;display:flex;flex-direction:column;
+    box-shadow:var(--shadow-sm);
+  }
+  .preview-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding-bottom:14px;border-bottom:1px solid var(--line);
+    font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+  .pill{
+    font-size:.7rem;font-weight:500;letter-spacing:0;text-transform:none;
+    color:var(--muted);background:#F4F6F3;border:1px solid var(--line);
+    padding:4px 10px;border-radius:999px;
+  }
+  .preview-stage{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:18px;padding:28px 10px;text-align:center;
+  }
+  .stage-skeleton{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
+  .stage-skeleton span{
+    display:block;height:10px;border-radius:5px;
+    background:linear-gradient(90deg,#EEF2EE,#F7F9F6,#EEF2EE);
+    background-size:200% 100%;
+    animation:shimmer 1.8s linear infinite;
+  }
+  .stage-skeleton span:nth-child(1){width:92%}
+  .stage-skeleton span:nth-child(2){width:74%}
+  .stage-skeleton span:nth-child(3){width:84%}
+  .stage-skeleton span:nth-child(4){width:58%}
+  @keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+  .stage-label{font-size:.86rem;color:var(--muted);max-width:34ch}
+
+  /* Video stage placeholder */
+  .stage-frame{
+    width:100%;max-width:360px;aspect-ratio:16/9;border-radius:14px;
+    background:linear-gradient(150deg,#0E1A15,#12332A 58%,#0B7A54);
+    display:grid;place-items:center;position:relative;overflow:hidden;
+  }
+  .stage-frame .pv-play{opacity:.75}
+
+  /* Image stage placeholder */
+  .stage-canvas{
+    width:100%;max-width:280px;aspect-ratio:1;border-radius:14px;
+    background:
+      radial-gradient(120% 120% at 20% 12%, rgba(52,211,153,.55), transparent 58%),
+      radial-gradient(110% 110% at 84% 82%, rgba(11,122,84,.6), transparent 60%),
+      linear-gradient(140deg,#E7F1EA,#F5F8F4);
+    border:1px solid var(--line);
+    display:grid;place-items:center;
+  }
+  .stage-canvas svg{width:34px;height:34px;stroke:#9DB5A9;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .site-footer{background:var(--tint);border-top:1px solid var(--line);padding:32px 0}
+  .footer-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
+  .footer-links{display:flex;flex-wrap:wrap;gap:24px;font-size:.87rem;color:var(--muted)}
+  .footer-links a{transition:color .2s ease}
+  .footer-links a:hover{color:var(--ink)}
+  .footer-copy{font-size:.82rem;color:var(--muted)}
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  .toast{
+    position:fixed;left:50%;bottom:28px;z-index:200;
+    transform:translate(-50%,18px);
+    background:var(--ink);color:#F7F7F4;
+    font-size:.86rem;line-height:1.45;text-align:center;
+    padding:13px 20px;border-radius:12px;
+    max-width:calc(100% - 40px);
+    box-shadow:0 26px 50px -24px rgba(0,0,0,.65);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width:1000px){
+    .hero-grid{grid-template-columns:1fr;gap:44px}
+    .hero-visual{max-width:520px;width:100%;margin-inline:auto}
+    .studio-grid{grid-template-columns:1fr 1fr}
+    .workspace{grid-template-columns:1fr}
+  }
+  @media (max-width:880px){
+    .nav-links{display:none}
+    .nav-toggle{display:inline-flex}
+    .nav-actions .btn-google{display:none}
+  }
+  @media (max-width:700px){
+    .shell{width:calc(100% - 40px)}
+    .hero{padding:44px 0 58px}
+    .section{padding:56px 0}
+    .studio-grid{grid-template-columns:1fr}
+    .steps{grid-template-columns:1fr}
+    .studio-shell{padding:28px 0 64px}
+    .footer-inner{flex-direction:column;align-items:flex-start;gap:16px}
+    .hero-actions .btn{width:100%}
+  }
+  @media (max-width:420px){
+    .hero h1{font-size:2.2rem}
+    .brand{font-size:1rem}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
     }
-    @media (max-width: 900px) {
-      .nav-links {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background: rgba(8, 8, 12, 0.97);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 32px;
-        padding: 24px;
-        margin-top: 16px;
-        gap: 1.4rem;
-        border: 1px solid rgba(139, 92, 246, 0.3);
-      }
-      .nav-links.active {
-        display: flex;
-      }
-      .mobile-menu {
-        display: block;
-      }
-      .nav-cta {
-        margin-left: auto;
-        margin-right: 16px;
-      }
-      .container {
-        padding: 0 20px;
-      }
-      .section-title {
-        font-size: 1.7rem;
-      }
-      .cards-grid {
-        gap: 20px;
-      }
-      .hero {
-        padding: 64px 0 50px;
-      }
-    }
-    @media (max-width: 600px) {
-      .prompt-form {
-        flex-direction: column;
-      }
-      .prompt-form .btn-primary {
-        width: 100%;
-        padding: 13px 26px;
-      }
-      .nav-cta .btn-primary {
-        padding: 9px 18px;
-        font-size: 0.85rem;
-      }
-      .hero-sub {
-        font-size: 1.05rem;
-      }
-      .badge {
-        font-size: 0.78rem;
-        padding: 7px 16px;
-      }
-      .glass-card {
-        padding: 28px !important;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-<nav class="navbar" id="navbar">
-  <div class="container nav-container">
-    <a class="logo" href="#">
-      <span class="logo-mark"></span>
-      <span>aavora.art</span>
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header" id="siteHeader">
+  <div class="shell nav-shell">
+    <a class="brand" href="#home" data-view="home" aria-label="Aavora.art home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
+      </span>
+      <span>aavora<span class="brand-dot">.art</span></span>
     </a>
-    <button class="mobile-menu" id="mobileMenuBtn" aria-label="Toggle menu">☰</button>
-    <div class="nav-links" id="navLinks">
-      <a href="#">Home</a>
-      <a href="#image">Image</a>
-      <a href="#video">Video</a>
-      <a href="#design">Design</a>
-      <a href="#about">About</a>
-    </div>
-    <div class="nav-cta">
-      <button class="btn-primary" id="exploreNavBtn">Start creating →</button>
+
+    <nav class="nav-links" aria-label="Studios">
+      <a href="#script" data-view="script">Script Studio</a>
+      <a href="#video" data-view="video">Video Studio</a>
+      <a href="#image" data-view="image">Image Studio</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn btn-google" type="button" data-google>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+
+      <button class="nav-toggle" id="navToggle" type="button"
+              aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileNav">
+        <span></span>
+      </button>
     </div>
   </div>
-</nav>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#script" data-view="script">Script Studio</a>
+    <a href="#video" data-view="video">Video Studio</a>
+    <a href="#image" data-view="image">Image Studio</a>
+    <button class="btn btn-google btn-block" type="button" data-google>
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span>Sign in with Google</span>
+    </button>
+  </div>
+</header>
 
 <main>
-  <!-- ================= HERO ================= -->
-  <div class="container hero">
-    <div class="hero-glow"></div>
-    <h1>Imagine it.<br>Aavora renders it.</h1>
-    <p class="hero-sub">Text to image, upscalers, background remover, text to video, design generators — all free, accurate, and beautifully designed.</p>
-    <div class="hero-buttons">
-      <button class="btn-primary" id="heroExploreBtn">Browse AI Tools</button>
-      <button class="btn-outline" id="heroCalcBtn">Try Live Studio ↓</button>
-    </div>
-    <div class="trust-badge">
-      <span class="badge">✨ 100% Free</span>
-      <span class="badge">🔒 No Signup</span>
-      <span class="badge">⚡ Blazing Fast</span>
-      <span class="badge">📱 App-like UI</span>
-    </div>
+
+  <!-- ==========================================================
+       HOME VIEW
+       ========================================================== -->
+  <div class="view is-active" id="view-home">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>AI Creation Platform</span>
+
+          <h1>Your Ideas. Your Stories. <em>Your Visuals.</em></h1>
+
+          <p class="hero-lede">
+            One creative space to write stories, generate cinematic videos,
+            and create stunning images with AI.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" type="button" data-view="script">
+              Start Creating
+              <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <a class="btn btn-ghost" href="#studios">Explore Studios</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="visual-frame">
+            <div class="visual-grid"></div>
+            <div class="visual-glow"></div>
+
+            <div class="visual-card vc-script">
+              <span class="vc-label">Script</span>
+              <span class="vc-lines"><i></i><i></i><i></i><i></i></span>
+            </div>
+
+            <div class="visual-card vc-video">
+              <span class="vc-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="vc-timeline"></span>
+              <span class="vc-label">Video</span>
+            </div>
+
+            <div class="visual-card vc-image">
+              <span class="vc-thumb"></span>
+              <span class="vc-label">Image</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDIOS -->
+    <section class="section" id="studios">
+      <div class="shell">
+        <div class="section-head">
+          <span class="eyebrow">Three studios</span>
+          <h2>Pick a studio and start creating.</h2>
+          <p>Everything you need to take an idea from the first line to the final frame.</p>
+        </div>
+
+        <div class="studio-grid">
+
+          <!-- Script Studio -->
+          <article class="studio-card">
+            <div class="studio-preview preview-script">
+              <span class="ps-tag">Draft</span>
+              <div class="ps-paper">
+                <span class="ps-line w-90"></span>
+                <span class="ps-line w-72"></span>
+                <span class="ps-line w-82"></span>
+                <span class="ps-line w-54"></span>
+              </div>
+            </div>
+            <div class="studio-body">
+              <h3>Script Studio</h3>
+              <p>Turn your story ideas into structured scripts.</p>
+              <button class="btn-card" type="button" data-view="script">
+                Open Script Studio
+                <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Video Studio -->
+          <article class="studio-card">
+            <div class="studio-preview preview-video">
+              <span class="pv-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="pv-bar"></span>
+            </div>
+            <div class="studio-body">
+              <h3>Video Studio</h3>
+              <p>Bring your ideas and images to life with AI video generation.</p>
+              <button class="btn-card" type="button" data-view="video">
+                Open Video Studio
+                <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Image Studio -->
+          <article class="studio-card">
+            <div class="studio-preview preview-image">
+              <span class="pi-orb"></span>
+            </div>
+            <div class="studio-body">
+              <h3>Image Studio</h3>
+              <p>Create cinematic visuals from text prompts.</p>
+              <button class="btn-card" type="button" data-view="image">
+                Open Image Studio
+                <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section class="section section-tint">
+      <div class="shell">
+        <div class="section-head">
+          <span class="eyebrow">How it works</span>
+          <h2>Three steps, nothing more.</h2>
+        </div>
+
+        <ol class="steps">
+          <li class="step">
+            <span class="step-num">01</span>
+            <h3>Choose your studio</h3>
+            <p>Pick the space that fits your idea — script, video or image.</p>
+          </li>
+          <li class="step">
+            <span class="step-num">02</span>
+            <h3>Describe your idea</h3>
+            <p>Write a few lines about what you want to create and set the style.</p>
+          </li>
+          <li class="step">
+            <span class="step-num">03</span>
+            <h3>Generate and download</h3>
+            <p>Create your result inside the studio and export it when you're happy.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
   </div>
 
-  <!-- ================= FEATURED LIVE STUDIO ================= -->
-  <div class="container" id="featuredCalc">
-    <div class="prompt-panel">
-      <div class="panel-head">
-        <span class="panel-title">✨ Aavora Prompt Studio</span>
-        <span class="panel-status" id="studioStatus">Ready</span>
+  <!-- ==========================================================
+       SCRIPT STUDIO VIEW
+       ========================================================== -->
+  <div class="view" id="view-script">
+    <div class="shell studio-shell">
+      <a class="back-link" href="#home" data-view="home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back to home
+      </a>
+
+      <div class="studio-head">
+        <span class="eyebrow">Script Studio</span>
+        <h1>Turn your story ideas into structured scripts.</h1>
+        <p>Describe the story you have in mind, choose a format and a tone, and build the structure of your script.</p>
       </div>
 
-      <form class="prompt-form" id="promptForm" autocomplete="off">
-        <input
-          id="promptInput"
-          type="text"
-          placeholder="A neon koi drifting through paper cranes…"
-          aria-label="Describe the image you want to create"
-          maxlength="140">
-        <button class="btn-primary" type="submit">Generate</button>
-      </form>
+      <div class="workspace">
+        <div class="panel">
+          <div class="field">
+            <label for="scriptIdea">Your idea</label>
+            <textarea id="scriptIdea" placeholder="A lighthouse keeper finds a message in a bottle that was written by her future self…"></textarea>
+          </div>
 
-      <div class="chips" id="chips">
-        <button class="chip" type="button" data-prompt="Ethereal forest spirit made of glowing moss">Forest spirit</button>
-        <button class="chip" type="button" data-prompt="Chrome liquid sculpture on black sand at dusk">Chrome liquid</button>
-        <button class="chip" type="button" data-prompt="Retro-futurist desert city, warm sunset haze">Retro city</button>
-        <button class="chip" type="button" data-prompt="Bioluminescent jellyfish in a nebula">Deep space</button>
-      </div>
+          <div class="field">
+            <label for="scriptFormat">Format</label>
+            <select id="scriptFormat">
+              <option>Short film</option>
+              <option>YouTube video</option>
+              <option>Advertising spot</option>
+              <option>Series episode</option>
+            </select>
+          </div>
 
-      <div class="studio-output" id="studioOutput">
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-        <div class="tile"></div>
-      </div>
+          <div class="field">
+            <label for="scriptTone">Tone</label>
+            <select id="scriptTone">
+              <option>Cinematic</option>
+              <option>Warm and human</option>
+              <option>Suspenseful</option>
+              <option>Light and playful</option>
+            </select>
+          </div>
 
-      <div class="panel-foot">
-        <span><span class="dot"></span>Aavora v3 · 4 variations</span>
-        <span>1024 × 1024</span>
-      </div>
-    </div>
-  </div>
+          <button class="btn btn-primary btn-block" type="button" data-generate="script">
+            Generate script
+            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
 
-  <!-- ================= SEARCH ================= -->
-  <div class="container search-section">
-    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search AI tools: upscaler, background remover, text to video, prompt...">
-    <div id="searchStatus"></div>
-  </div>
+          <p class="panel-note">
+            This studio is a ready-to-build shell. Script generation will be enabled once a
+            script model is connected.
+          </p>
+        </div>
 
-  <!-- ================= DYNAMIC SECTIONS ================= -->
-  <div id="dynamicContent" class="container"></div>
-
-  <!-- ================= WHY CHOOSE US ================= -->
-  <div class="container">
-    <h2 class="section-title">Why choose Aavora?</h2>
-    <div class="why-grid">
-      <div class="card"><div class="card-icon">⚡</div><h3>Lightning Fast</h3><p>Client-side processing, instant results.</p></div>
-      <div class="card"><div class="card-icon">🎯</div><h3>Studio-Grade Output</h3><p>Detail-aware rendering and 4K upscaling.</p></div>
-      <div class="card"><div class="card-icon">🔐</div><h3>Privacy First</h3><p>No data storage, zero tracking.</p></div>
-      <div class="card"><div class="card-icon">📱</div><h3>Mobile Perfected</h3><p>Smooth like a native app.</p></div>
-      <div class="card"><div class="card-icon">💎</div><h3>Free Forever</h3><p>No premium tiers, no paywalls.</p></div>
-    </div>
-  </div>
-
-  <!-- ================= SEO CONTENT BLOCK ================= -->
-  <div class="container" style="margin: 70px 0;">
-    <div class="glass-card" style="padding: 48px; border-radius: 40px;">
-      <h2 class="section-title" style="margin-bottom: 20px;">Create gallery-grade visuals without a render farm</h2>
-      <p style="font-size: 1.05rem; color: #D8D8E4;">From <strong>text-to-image generation, 4K upscaling and background removal</strong> to <strong>text-to-video, logo generation and prompt engineering</strong> — Aavora delivers studio-grade output inside a futuristic interface. Whether you're an illustrator, marketer, or founder shipping your first landing page, our free tools give you instant results. No downloads, no signups, just pure creative power.</p>
-      <div style="display: flex; flex-wrap: wrap; gap: 24px; margin-top: 30px;">
-        <a href="#image" style="color:#A78BFA; text-decoration:none;">🎨 Image Tools →</a>
-        <a href="#video" style="color:#A78BFA; text-decoration:none;">🎬 Video Tools →</a>
-        <a href="#design" style="color:#A78BFA; text-decoration:none;">✨ Design Tools →</a>
-        <a href="#utility" style="color:#A78BFA; text-decoration:none;">🛠️ Utility Tools →</a>
+        <div class="preview-panel">
+          <div class="preview-head">
+            <span>Preview</span>
+            <span class="pill">Not generated</span>
+          </div>
+          <div class="preview-stage">
+            <div class="stage-skeleton" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <p class="stage-label">Your structured script will appear here.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ================= BLOG PREVIEW ================= -->
-  <div class="container" id="blog">
-    <h2 class="section-title">📘 Expert insights &amp; guides</h2>
-    <div class="cards-grid" style="margin-bottom: 40px;">
-      <div class="card"><h3>🎨 Prompt Crafting 101</h3><p>How to write prompts that consistently deliver gallery-grade art.</p><a href="#" class="tool-btn" style="background:#1A1A26;">Read →</a></div>
-      <div class="card"><h3>🔍 Upscaling Without Artifacts</h3><p>Get print-ready 4K files from a single 1024px concept.</p><a href="#" class="tool-btn" style="background:#1A1A26;">Read →</a></div>
-      <div class="card"><h3>🎬 From Still to Motion</h3><p>Turn a single image into a cinematic 6-second loop.</p><a href="#" class="tool-btn" style="background:#1A1A26;">Read →</a></div>
-      <div class="card"><h3>🏷️ Branding with AI</h3><p>Build a consistent logo and palette in an afternoon.</p><a href="#" class="tool-btn" style="background:#1A1A26;">Read →</a></div>
+  <!-- ==========================================================
+       VIDEO STUDIO VIEW
+       ========================================================== -->
+  <div class="view" id="view-video">
+    <div class="shell studio-shell">
+      <a class="back-link" href="#home" data-view="home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back to home
+      </a>
+
+      <div class="studio-head">
+        <span class="eyebrow">Video Studio</span>
+        <h1>Bring your ideas and images to life with AI video generation.</h1>
+        <p>Describe the scene, pick a look and a duration, then bring your visuals into motion.</p>
+      </div>
+
+      <div class="workspace">
+        <div class="panel">
+          <div class="field">
+            <label for="videoPrompt">Scene description</label>
+            <textarea id="videoPrompt" placeholder="Slow dolly through a rain-soaked neon street, reflections on the pavement, cinematic…"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Look</label>
+            <div class="chip-row" data-chip-group>
+              <button class="chip is-selected" type="button">Cinematic</button>
+              <button class="chip" type="button">Documentary</button>
+              <button class="chip" type="button">Anime</button>
+              <button class="chip" type="button">Product</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="videoAspect">Aspect ratio</label>
+            <select id="videoAspect">
+              <option>16:9 — Landscape</option>
+              <option>9:16 — Portrait</option>
+              <option>1:1 — Square</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="videoDuration">Duration</label>
+            <select id="videoDuration">
+              <option>4 seconds</option>
+              <option>6 seconds</option>
+              <option>8 seconds</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary btn-block" type="button" data-generate="video">
+            Generate video
+            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+
+          <p class="panel-note">
+            This studio is a ready-to-build shell. Video generation will be enabled once a
+            video model is connected.
+          </p>
+        </div>
+
+        <div class="preview-panel">
+          <div class="preview-head">
+            <span>Preview</span>
+            <span class="pill">Not generated</span>
+          </div>
+          <div class="preview-stage">
+            <div class="stage-frame" aria-hidden="true">
+              <span class="pv-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+            </div>
+            <p class="stage-label">Your generated clip will appear here.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ================= FAQ ================= -->
-  <div class="container">
-    <h2 class="section-title">Frequently asked questions</h2>
-    <div id="faqContainer">
-      <div class="faq-item"><div class="faq-question">📌 Are all AI tools free? <span>➕</span></div><div class="faq-answer">Yes, 100% free with no hidden subscriptions.</div></div>
-      <div class="faq-item"><div class="faq-question">📌 Do I need an account? <span>➕</span></div><div class="faq-answer">No account required — generations happen instantly in your browser.</div></div>
-      <div class="faq-item"><div class="faq-question">📌 Do I own the images I generate? <span>➕</span></div><div class="faq-answer">Yes. Everything you create is yours to use, including commercially.</div></div>
-      <div class="faq-item"><div class="faq-question">📌 Is my data safe? <span>➕</span></div><div class="faq-answer">Absolutely. All processing is local — no prompts or images are sent to servers.</div></div>
-      <div class="faq-item"><div class="faq-question">📌 Can I use Aavora on mobile? <span>➕</span></div><div class="faq-answer">Yes, fully responsive with touch-friendly cards and navigation.</div></div>
+  <!-- ==========================================================
+       IMAGE STUDIO VIEW
+       ========================================================== -->
+  <div class="view" id="view-image">
+    <div class="shell studio-shell">
+      <a class="back-link" href="#home" data-view="home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back to home
+      </a>
+
+      <div class="studio-head">
+        <span class="eyebrow">Image Studio</span>
+        <h1>Create cinematic visuals from text prompts.</h1>
+        <p>Describe the image you want, choose a style and a frame, and shape your visuals from a single sentence.</p>
+      </div>
+
+      <div class="workspace">
+        <div class="panel">
+          <div class="field">
+            <label for="imagePrompt">Prompt</label>
+            <textarea id="imagePrompt" placeholder="A lone figure on a glass cliff at sunrise, soft haze, editorial photography…"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Style</label>
+            <div class="chip-row" data-chip-group>
+              <button class="chip is-selected" type="button">Photographic</button>
+              <button class="chip" type="button">Cinematic</button>
+              <button class="chip" type="button">Illustration</button>
+              <button class="chip" type="button">3D render</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="imageAspect">Aspect ratio</label>
+            <select id="imageAspect">
+              <option>1:1 — Square</option>
+              <option>4:5 — Portrait</option>
+              <option>3:2 — Landscape</option>
+              <option>16:9 — Widescreen</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary btn-block" type="button" data-generate="image">
+            Generate image
+            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+
+          <p class="panel-note">
+            This studio is a ready-to-build shell. Image generation will be enabled once an
+            image model is connected.
+          </p>
+        </div>
+
+        <div class="preview-panel">
+          <div class="preview-head">
+            <span>Preview</span>
+            <span class="pill">Not generated</span>
+          </div>
+          <div class="preview-stage">
+            <div class="stage-canvas" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M3 16.5l4.6-4.2a2 2 0 012.7 0L21 21"/></svg>
+            </div>
+            <p class="stage-label">Your generated image will appear here.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ================= ABOUT ================= -->
-  <div class="container" id="about" style="margin: 70px 0 50px;">
-    <h2 class="section-title">About aavora.art</h2>
-    <div class="glass-card" style="padding: 40px;">
-      <p>Aavora.art is a next-generation free AI creation ecosystem blending glassmorphism design with robust generative logic. We cover image generation, video tools, design systems, and prompting utilities. Every tool is optimized for SEO and Core Web Vitals, ensuring blazing-fast performance on GitHub Pages. Built with pure HTML/CSS/JS, privacy-first, and ready to scale to 1000+ tools. No backend, no databases — just pure client-side excellence.</p>
-    </div>
-  </div>
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer>
-  <div class="container footer-grid">
-    <div class="footer-col">
-      <h4>✨ aavora.art</h4>
-      <p>AI creation made simple. Free, fast, futuristic.</p>
-      <p style="margin-top: 12px;">📍 Trusted by thousands</p>
-    </div>
-    <div class="footer-col">
-      <h4>Quick links</h4>
-      <a href="#">Home</a>
-      <a href="#image">AI Tools</a>
-      <a href="#blog">Blog</a>
-      <a href="#about">About</a>
-    </div>
-    <div class="footer-col">
-      <h4>Popular tools</h4>
-      <a href="text-to-image.html">Text to Image</a>
-      <a href="image-upscaler.html">Image Upscaler</a>
-      <a href="background-remover.html">Background Remover</a>
-      <a href="text-to-video.html">Text to Video</a>
-    </div>
-    <div class="footer-col">
-      <h4>Legal</h4>
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="shell footer-inner">
+    <a class="brand" href="#home" data-view="home" aria-label="Aavora.art home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
+      </span>
+      <span>aavora<span class="brand-dot">.art</span></span>
+    </a>
+
+    <nav class="footer-links" aria-label="Footer">
       <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Use</a>
-      <a href="#">Licence</a>
-      <a href="#">Sitemap</a>
-    </div>
-    <div class="footer-col">
-      <h4>Support</h4>
-      <p>📧 hello@aavora.art</p>
-      <p>🌍 24/7 online</p>
-    </div>
-  </div>
-  <div class="container footer-bottom">
-    <p>© <span id="year">2025</span> aavora.art — Premium free AI creation tools. All rights reserved.</p>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </nav>
+
+    <p class="footer-copy">© <span id="year">2025</span> Aavora.art</p>
   </div>
 </footer>
 
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
+(function () {
+  'use strict';
+
   /* ============================================================
-     GENERATIVE ART (layered CSS gradients)
+     VIEW SWITCHING
      ============================================================ */
-  function mulberry32(seed) {
-    return function () {
-      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
-      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
+  var views = {
+    home:   document.getElementById('view-home'),
+    script: document.getElementById('view-script'),
+    video:  document.getElementById('view-video'),
+    image:  document.getElementById('view-image')
+  };
+
+  var titles = {
+    home:   'Aavora.art — Your Ideas. Your Stories. Your Visuals.',
+    script: 'Script Studio — Aavora.art',
+    video:  'Video Studio — Aavora.art',
+    image:  'Image Studio — Aavora.art'
+  };
+
+  var navAnchors = document.querySelectorAll('.nav-links a, .mobile-nav a');
+  var mobileNav = document.getElementById('mobileNav');
+  var navToggle = document.getElementById('navToggle');
+
+  function closeMobileNav() {
+    mobileNav.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
   }
 
-  function makeArt(rand) {
-    var r = function (a, b) { return a + rand() * (b - a); };
-    var h1 = Math.floor(rand() * 360);
-    var h2 = Math.floor((h1 + 40 + rand() * 140) % 360);
-    var h3 = Math.floor((h1 + 180 + rand() * 120) % 360);
-    var spin = Math.floor(rand() * 360);
-    return [
-      'radial-gradient(circle at ' + r(12, 88).toFixed(1) + '% ' + r(12, 88).toFixed(1) + '%, hsl(' + h1 + ' 92% 62% / .95), transparent 58%)',
-      'radial-gradient(circle at ' + r(12, 88).toFixed(1) + '% ' + r(12, 88).toFixed(1) + '%, hsl(' + h2 + ' 92% 58% / .9), transparent 56%)',
-      'radial-gradient(circle at ' + r(12, 88).toFixed(1) + '% ' + r(12, 88).toFixed(1) + '%, hsl(' + h3 + ' 95% 55% / .85), transparent 60%)',
-      'linear-gradient(' + spin + 'deg, hsl(' + h1 + ' 62% 10%), hsl(' + h2 + ' 62% 7%))'
-    ].join(', ');
+  function syncNav(name) {
+    Array.prototype.forEach.call(navAnchors, function (a) {
+      var active = a.getAttribute('data-view') === name;
+      a.classList.toggle('is-active', active);
+      if (active) {
+        a.setAttribute('aria-current', 'page');
+      } else {
+        a.removeAttribute('aria-current');
+      }
+    });
   }
 
-  /* ============================================================
-     LIVE PROMPT STUDIO
-     ============================================================ */
-  (function () {
-    var form = document.getElementById('promptForm');
-    var input = document.getElementById('promptInput');
-    var tiles = Array.prototype.slice.call(document.querySelectorAll('#studioOutput .tile'));
-    var statusEl = document.getElementById('studioStatus');
-    var generating = false;
+  function showView(name, push) {
+    if (!views[name]) name = 'home';
 
-    function paintTiles() {
-      tiles.forEach(function (tile) {
-        tile.style.background = makeArt(Math.random);
-      });
-    }
-
-    function generate(prompt) {
-      if (generating) return;
-      generating = true;
-
-      tiles.forEach(function (tile) {
-        tile.classList.add('loading');
-        tile.style.background = '';
-      });
-      statusEl.textContent = 'Parsing prompt…';
-
-      var phases = ['Composing layout…', 'Painting light…', 'Rendering detail…', 'Upscaling…'];
-      var i = 0;
-      var timer = setInterval(function () {
-        statusEl.textContent = phases[Math.min(i, phases.length - 1)];
-        i++;
-      }, 340);
-
-      var start = Date.now();
-
-      setTimeout(function () {
-        clearInterval(timer);
-        tiles.forEach(function (tile) {
-          tile.classList.remove('loading');
-          tile.style.background = makeArt(Math.random);
-        });
-
-        var secs = ((Date.now() - start) / 1000).toFixed(1);
-        var label = prompt
-          ? '“' + prompt.slice(0, 24) + (prompt.length > 24 ? '…' : '') + '”'
-          : '4 variations';
-        statusEl.textContent = 'Done in ' + secs + 's · ' + label;
-        generating = false;
-      }, 1500);
-    }
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      generate(input.value.trim());
+    Object.keys(views).forEach(function (key) {
+      views[key].classList.toggle('is-active', key === name);
     });
 
-    Array.prototype.forEach.call(document.querySelectorAll('#chips .chip'), function (chip) {
-      chip.addEventListener('click', function () {
-        input.value = chip.getAttribute('data-prompt') || '';
-        input.focus();
-        generate(input.value.trim());
-      });
-    });
+    syncNav(name);
+    closeMobileNav();
+    document.title = titles[name];
 
-    paintTiles();
-  })();
+    if (push) {
+      var url = name === 'home'
+        ? window.location.pathname + window.location.search
+        : '#' + name;
+      history.pushState({ view: name }, '', url);
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  /* Initial view from URL hash */
+  var initial = (window.location.hash || '').replace('#', '');
+  var startView = views[initial] ? initial : 'home';
+  showView(startView, false);
+  history.replaceState(
+    { view: startView },
+    '',
+    startView === 'home'
+      ? window.location.pathname + window.location.search
+      : '#' + startView
+  );
+
+  /* Delegated navigation */
+  document.addEventListener('click', function (event) {
+    var trigger = event.target.closest ? event.target.closest('[data-view]') : null;
+    if (!trigger) return;
+    event.preventDefault();
+    showView(trigger.getAttribute('data-view'), true);
+  });
+
+  /* Browser back / forward */
+  window.addEventListener('popstate', function (event) {
+    var name = (event.state && event.state.view) ||
+               (window.location.hash || '').replace('#', '') ||
+               'home';
+    showView(name, false);
+  });
 
   /* ============================================================
-     TOOLS DATABASE
+     MOBILE NAV
      ============================================================ */
-  var toolsDB = [
-    /* ---------- Image ---------- */
-    { name: "Text to Image",           category: "Image", slug: "text-to-image.html",           icon: "🖼️", desc: "Turn any sentence into gallery-grade art in seconds." },
-    { name: "Image Upscaler",          category: "Image", slug: "image-upscaler.html",          icon: "🔍", desc: "Detail-aware 4K upscaling without artifacts." },
-    { name: "Background Remover",      category: "Image", slug: "background-remover.html",      icon: "✂️", desc: "Cut out any subject cleanly in one click." },
-    { name: "AI Inpainting",           category: "Image", slug: "ai-inpainting.html",           icon: "🖌️", desc: "Brush a region and describe the change." },
-    { name: "Style Transfer",          category: "Image", slug: "style-transfer.html",          icon: "🎨", desc: "Restyle any photo into any artistic look." },
-    { name: "Face Restore",            category: "Image", slug: "face-restore.html",            icon: "🧑", desc: "Repair blurry or damaged portraits." },
-    { name: "Sketch to Image",         category: "Image", slug: "sketch-to-image.html",         icon: "✏️", desc: "Turn rough line art into finished renders." },
-    { name: "Image to Prompt",         category: "Image", slug: "image-to-prompt.html",         icon: "💬", desc: "Reverse-engineer the prompt behind any image." },
-    { name: "AI Avatar Maker",         category: "Image", slug: "ai-avatar-maker.html",         icon: "👤", desc: "Generate profile portraits in any style." },
-    { name: "Product Shot Generator",  category: "Image", slug: "product-shot-generator.html",  icon: "📦", desc: "Studio-quality product photos on demand." },
-    { name: "Colorize B&W Photos",     category: "Image", slug: "colorize-photos.html",         icon: "🌈", desc: "Bring old monochrome photos back to life." },
+  navToggle.addEventListener('click', function () {
+    var open = mobileNav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
 
-    /* ---------- Video ---------- */
-    { name: "Text to Video",           category: "Video", slug: "text-to-video.html",           icon: "🎬", desc: "Describe a scene and get a 6-second clip." },
-    { name: "Image to Video",          category: "Video", slug: "image-to-video.html",          icon: "🎞️", desc: "Animate any still with natural camera motion." },
-    { name: "Video Upscaler",          category: "Video", slug: "video-upscaler.html",          icon: "📺", desc: "Upscale footage to crisp 4K resolution." },
-    { name: "Motion Brush",            category: "Video", slug: "motion-brush.html",            icon: "🌀", desc: "Paint exactly which pixels should move." },
-    { name: "Lip Sync",                category: "Video", slug: "lip-sync.html",                icon: "👄", desc: "Sync any portrait to an audio track." },
-    { name: "Video Restyle",           category: "Video", slug: "video-restyle.html",           icon: "🎛️", desc: "Apply an artistic style to existing footage." },
-    { name: "GIF Maker",               category: "Video", slug: "gif-maker.html",               icon: "🖇️", desc: "Convert clips and image sequences to GIF." },
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closeMobileNav();
+  });
 
-    /* ---------- Design ---------- */
-    { name: "Logo Maker",              category: "Design", slug: "logo-maker.html",             icon: "🏷️", desc: "Generate a complete logo suite instantly." },
-    { name: "Poster Maker",            category: "Design", slug: "poster-maker.html",           icon: "🪧", desc: "Editorial-grade posters from one prompt." },
-    { name: "Thumbnail Maker",         category: "Design", slug: "thumbnail-maker.html",        icon: "🖼️", desc: "High-CTR thumbnails for any platform." },
-    { name: "Mockup Generator",        category: "Design", slug: "mockup-generator.html",       icon: "👕", desc: "Place your art on realistic mockups." },
-    { name: "Color Palette Generator", category: "Design", slug: "color-palette-generator.html",icon: "🎨", desc: "Build harmonious palettes from a vibe." },
-    { name: "Font Pairing Tool",       category: "Design", slug: "font-pairing.html",           icon: "🔤", desc: "Find typefaces that actually work together." },
-    { name: "Social Post Designer",    category: "Design", slug: "social-post-designer.html",   icon: "📱", desc: "Square, story and banner layouts in seconds." },
-    { name: "Business Card Maker",     category: "Design", slug: "business-card-maker.html",    icon: "💼", desc: "Print-ready cards with a consistent identity." },
-
-    /* ---------- Utility ---------- */
-    { name: "Prompt Generator",        category: "Utility", slug: "prompt-generator.html",        icon: "✨", desc: "Turn a vague idea into a rich, usable prompt." },
-    { name: "Prompt Library",          category: "Utility", slug: "prompt-library.html",          icon: "📚", desc: "900+ curated, copy-paste ready prompts." },
-    { name: "Aspect Ratio Calculator", category: "Utility", slug: "aspect-ratio-calculator.html", icon: "📐", desc: "Resize to any social or print ratio." },
-    { name: "Image Compressor",        category: "Utility", slug: "image-compressor.html",        icon: "🗜️", desc: "Shrink files without visible quality loss." },
-    { name: "SVG to PNG Converter",    category: "Utility", slug: "svg-to-png.html",              icon: "🔄", desc: "Export vectors at any resolution." },
-    { name: "AI Caption Writer",       category: "Utility", slug: "ai-caption-writer.html",       icon: "📝", desc: "Scroll-stopping captions for any post." },
-    { name: "Hashtag Generator",       category: "Utility", slug: "hashtag-generator.html",       icon: "#️⃣", desc: "Relevant hashtags ranked by reach." },
-    { name: "Token Counter",           category: "Utility", slug: "token-counter.html",           icon: "🔢", desc: "Measure prompt length for any model." },
-    { name: "Text to Speech",          category: "Utility", slug: "text-to-speech.html",          icon: "🔊", desc: "Natural narration for videos and reels." }
-  ];
-
-  var popularList = [
-    { name: "Text to Image",      slug: "text-to-image.html",      icon: "🖼️", desc: "The fastest way to turn words into art." },
-    { name: "Image Upscaler",     slug: "image-upscaler.html",     icon: "🔍", desc: "Print-ready 4K from a single render." },
-    { name: "Background Remover", slug: "background-remover.html", icon: "✂️", desc: "Clean cutouts, no manual masking." },
-    { name: "Text to Video",      slug: "text-to-video.html",      icon: "🎬", desc: "Cinematic motion from a sentence." }
-  ];
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 880) closeMobileNav();
+  });
 
   /* ============================================================
-     DYNAMIC SECTION RENDERING
+     HEADER SCROLL STATE
      ============================================================ */
-  function renderAllSections(filter) {
-    filter = (filter || "").toLowerCase();
-    var container = document.getElementById('dynamicContent');
-    container.innerHTML = "";
+  var header = document.getElementById('siteHeader');
 
-    /* ---- Popular ---- */
-    var popularFiltered = popularList.filter(function (p) {
-      return p.name.toLowerCase().indexOf(filter) !== -1;
-    });
-    if (popularFiltered.length) {
-      var popHtml = '<section style="margin-bottom: 70px;"><h2 class="section-title">⭐ Most Popular</h2><div class="cards-grid">';
-      popularFiltered.forEach(function (p) {
-        popHtml += '<div class="card"><div class="card-icon">' + p.icon + '</div>' +
-          '<h3>' + p.name + '</h3><p>' + p.desc + '</p>' +
-          '<a href="' + p.slug + '" class="tool-btn">Use Tool →</a></div>';
-      });
-      popHtml += '</div></section>';
-      container.innerHTML += popHtml;
-    }
+  function onScroll() {
+    header.classList.toggle('is-scrolled', window.scrollY > 8);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-    /* ---- Category sections ---- */
-    var sections = [
-      { key: "Image",   title: "🖼️ Image Generation & Editing", icon: "🖼️" },
-      { key: "Video",   title: "🎬 Video & Motion",              icon: "🎬" },
-      { key: "Design",  title: "✨ Design & Branding",           icon: "✨" },
-      { key: "Utility", title: "🛠️ Prompting & Utility",        icon: "🛠️" }
-    ];
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
 
-    sections.forEach(function (sec) {
-      var items = toolsDB.filter(function (c) {
-        return c.category === sec.key && c.name.toLowerCase().indexOf(filter) !== -1;
-      });
-      if (!items.length) return;
-
-      var id = sec.key.toLowerCase().replace(/[^a-z]/g, '');
-      var html = '<section id="' + id + '" style="margin-bottom: 80px;">' +
-        '<div class="section-header"><span>' + sec.icon + '</span>' +
-        '<h2 class="section-title">' + sec.title + '</h2></div>' +
-        '<div class="cards-grid">';
-
-      items.forEach(function (item) {
-        html += '<div class="card"><div class="card-icon">' + item.icon + '</div>' +
-          '<h3>' + item.name + '</h3><p>' + item.desc + '</p>' +
-          '<a href="' + item.slug + '" class="tool-btn">Use Tool →</a></div>';
-      });
-
-      html += '</div></section>';
-      container.innerHTML += html;
-    });
-
-    if (container.innerHTML === "") {
-      container.innerHTML = "<div class='glass-card' style='padding:50px; text-align:center; color:#A8A8BC;'>✨ No tools found. Try another keyword.</div>";
-    }
+  function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add('is-visible');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function () {
+      toastEl.classList.remove('is-visible');
+    }, 4600);
   }
 
   /* ============================================================
-     SEARCH
+     GOOGLE SIGN-IN (not connected)
      ============================================================ */
-  var searchBox = document.getElementById('searchInput');
-  var statusDiv = document.getElementById('searchStatus');
-
-  searchBox.addEventListener('input', function (e) {
-    var value = e.target.value;
-    renderAllSections(value);
-    statusDiv.textContent = value ? '🔍 Showing results for “' + value + '”' : '';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-google]'), function (btn) {
+    btn.addEventListener('click', function () {
+      showToast('Google Sign-In is not connected yet. Add your OAuth client to enable accounts.');
+    });
   });
-
-  renderAllSections("");
 
   /* ============================================================
-     INTERACTIONS
+     STUDIO GENERATE BUTTONS (not connected)
      ============================================================ */
-  document.getElementById('mobileMenuBtn').addEventListener('click', function () {
-    document.getElementById('navLinks').classList.toggle('active');
-  });
+  var studioNames = { script: 'Script', video: 'Video', image: 'Image' };
 
-  document.getElementById('heroExploreBtn').addEventListener('click', function () {
-    searchBox.focus();
-    searchBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
-
-  document.getElementById('heroCalcBtn').addEventListener('click', function () {
-    document.getElementById('featuredCalc').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
-
-  document.getElementById('exploreNavBtn').addEventListener('click', function () {
-    searchBox.focus();
-    searchBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
-
-  /* Close mobile menu after clicking a link */
-  Array.prototype.forEach.call(document.querySelectorAll('#navLinks a'), function (link) {
-    link.addEventListener('click', function () {
-      document.getElementById('navLinks').classList.remove('active');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-generate]'), function (btn) {
+    btn.addEventListener('click', function () {
+      var studio = btn.getAttribute('data-generate');
+      var label = studioNames[studio] || 'Studio';
+      showToast(label + ' generation is not connected yet. This studio is ready for your model API.');
     });
   });
 
-  /* FAQ accordion */
-  Array.prototype.forEach.call(document.querySelectorAll('.faq-item'), function (item) {
-    var q = item.querySelector('.faq-question');
-    var ans = item.querySelector('.faq-answer');
-    var icon = q.querySelector('span');
-    q.addEventListener('click', function () {
-      var open = ans.style.display === 'block';
-      ans.style.display = open ? 'none' : 'block';
-      icon.textContent = open ? '➕' : '➖';
+  /* ============================================================
+     CHIP SELECTION (style pickers)
+     ============================================================ */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-chip-group]'), function (group) {
+    group.addEventListener('click', function (event) {
+      var chip = event.target.closest ? event.target.closest('.chip') : null;
+      if (!chip) return;
+      Array.prototype.forEach.call(group.querySelectorAll('.chip'), function (item) {
+        item.classList.toggle('is-selected', item === chip);
+      });
     });
   });
 
-  /* Footer year */
+  /* ============================================================
+     FOOTER YEAR
+     ============================================================ */
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  /* ============================================================
-     STRUCTURED DATA
-     ============================================================ */
-  var schema = document.createElement('script');
-  schema.type = 'application/ld+json';
-  schema.textContent = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Aavora.art",
-    "url": "https://aavora.art",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://aavora.art/?s={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  });
-  document.head.appendChild(schema);
+})();
 </script>
+
 </body>
 </html>
