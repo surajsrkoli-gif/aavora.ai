@@ -1047,17 +1047,7 @@
     }, 4600);
   }
 
-  /* ============================================================
-     GOOGLE AUTH PLACEHOLDER
-     ============================================================ */
-  $$('[data-auth]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      showToast(
-        'Google Sign-In is not connected yet. Authentication will be enabled ' +
-        'once Firebase Authentication is configured.'
-      );
-    });
-  });
+  /* Google authentication is handled by the Firebase module below. */
 
   /* ============================================================
      IMAGE STUDIO — CONFIG
@@ -1567,6 +1557,102 @@
      ============================================================ */
   $('#year').textContent = new Date().getFullYear();
 })();
+</script>
+
+
+<!-- Firebase Google Authentication -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+  // Replace these placeholder values with your Firebase web-app config.
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3WkLoBnr0Uwi05Y9MObDH_yGNz5yjQUE",
+    authDomain: "aavora-53900.firebaseapp.com",
+    projectId: "aavora-53900",
+    storageBucket: "aavora-53900.firebasestorage.app",
+    messagingSenderId: "250774635360",
+    appId: "1:250774635360:web:0b7cdf6d7b13ced0151405"
+  };
+
+  const authButtons = Array.from(document.querySelectorAll("[data-auth]"));
+  const toast = document.getElementById("toast");
+  let toastTimer;
+
+  function authToast(message) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 4600);
+  }
+
+  function configIsReady() {
+    return firebaseConfig.apiKey !== "PASTE_YOUR_API_KEY_HERE" &&
+      firebaseConfig.projectId !== "PASTE_YOUR_PROJECT_ID_HERE" &&
+      firebaseConfig.appId !== "PASTE_YOUR_APP_ID_HERE";
+  }
+
+  if (!configIsReady()) {
+    authButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        authToast("Firebase config abhi add nahi hua. Firebase Console se apna web config paste karo.");
+      });
+    });
+  } else {
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      authButtons.forEach((button) => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            if (auth.currentUser) {
+              await signOut(auth);
+              authToast("Google account se sign out ho gaya.");
+            } else {
+              await signInWithPopup(auth, provider);
+            }
+          } catch (error) {
+            console.error("Firebase authentication error:", error);
+            const code = error && error.code;
+            if (code === "auth/unauthorized-domain") {
+              authToast("Firebase Console → Authentication → Settings me aavora.art ko Authorized domains me add karo.");
+            } else if (code === "auth/popup-blocked") {
+              authToast("Popup blocked hai. Browser me pop-ups allow karke dobara try karo.");
+            } else if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+              authToast("Sign-in cancel hua. Dobara try kar sakte ho.");
+            } else {
+              authToast("Google sign-in fail hua. Firebase config aur Google provider settings check karo.");
+            }
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+
+      onAuthStateChanged(auth, (user) => {
+        authButtons.forEach((button) => {
+          const label = button.querySelector("span");
+          if (label) label.textContent = user ? "Sign out" : "Sign in with Google";
+          button.setAttribute("aria-label", user ? "Sign out from Google" : "Sign in with Google");
+          button.title = user && user.email ? user.email : "Sign in with Google";
+        });
+      });
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+      authToast("Firebase initialize nahi hua. Apna Firebase web config check karo.");
+    }
+  }
 </script>
 
 </body>
