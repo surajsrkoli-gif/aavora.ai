@@ -1123,23 +1123,114 @@
     }, 4500);
   }
 
-  /* ------------------------------------------------------------
-     Google sign-in placeholder (no fake login)
-     ------------------------------------------------------------ */
-  Array.prototype.forEach.call(document.querySelectorAll('[data-auth]'), function (btn) {
-    btn.addEventListener('click', function () {
-      showToast(
-        'Google Sign-In is not connected yet. Authentication will be enabled once ' +
-        'Firebase Authentication is configured.'
-      );
-    });
-  });
+  /* Google authentication is handled by the Firebase module below. */
 
   /* ------------------------------------------------------------
      Footer year
      ------------------------------------------------------------ */
   document.getElementById('year').textContent = new Date().getFullYear();
 })();
+</script>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+  /*
+   * IMPORTANT: Replace the placeholder strings below with values from:
+   * Firebase Console → Project settings → General → Your apps → SDK setup and configuration → Config
+   */
+  const firebaseConfig = {
+    apiKey: "AIzaSyC3WkLoBnr0Uwi05Y9MObDH_yGNz5yjQUE",
+    authDomain: "aavora-53900.firebaseapp.com",
+    projectId: "aavora-53900",
+    storageBucket: "aavora-53900.firebasestorage.app",
+    messagingSenderId: "250774635360",
+    appId: "1:250774635360:web:0b7cdf6d7b13ced0151405"
+  };
+
+  const authButtons = Array.from(document.querySelectorAll("[data-auth]"));
+  const toast = document.getElementById("toast");
+  let toastTimer;
+
+  function showAuthToast(message) {
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 5000);
+  }
+
+  function configIsIncomplete() {
+    return Object.values(firebaseConfig).some(value => value.includes("PASTE_YOUR"));
+  }
+
+  if (configIsIncomplete()) {
+    authButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        showAuthToast("Firebase config add karo: Project settings → Your apps → Config.");
+      });
+    });
+    console.warn("Aavora.art: Replace the Firebase config placeholders before testing Google Sign-In.");
+  } else {
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+
+      authButtons.forEach(button => {
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            if (auth.currentUser) {
+              await signOut(auth);
+              showAuthToast("You have been signed out.");
+            } else {
+              await signInWithPopup(auth, provider);
+            }
+          } catch (error) {
+            console.error("Google Sign-In error:", error);
+            const messages = {
+              "auth/unauthorized-domain": "Domain authorize nahi hai. Firebase Authentication settings mein aavora.art add karo.",
+              "auth/popup-blocked": "Browser ne popup block kiya. Popups allow karke dobara try karo.",
+              "auth/popup-closed-by-user": "Login window close ho gayi. Dobara try kar sakte ho.",
+              "auth/network-request-failed": "Network issue. Internet check karke dobara try karo."
+            };
+            showAuthToast(messages[error.code] || ("Google Sign-In failed: " + (error.code || error.message)));
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+
+      onAuthStateChanged(auth, user => {
+        authButtons.forEach(button => {
+          const label = button.querySelector("span");
+          if (!label) return;
+          if (user) {
+            const name = user.displayName || user.email || "Account";
+            label.textContent = "Sign out (" + name + ")";
+            button.setAttribute("aria-label", "Signed in as " + name + ". Click to sign out.");
+            button.title = "Signed in as " + name + ". Click to sign out.";
+          } else {
+            label.textContent = "Sign in with Google";
+            button.setAttribute("aria-label", "Sign in with Google");
+            button.removeAttribute("title");
+          }
+        });
+      });
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+      showAuthToast("Firebase setup error. Config check karo aur page refresh karo.");
+    }
+  }
 </script>
 
 </body>
