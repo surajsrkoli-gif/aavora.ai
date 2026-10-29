@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Aavora.art — Your Ideas. Your Stories. Your Visuals.</title>
-<meta name="description" content="Aavora.art is one creative space to write stories, generate cinematic videos, and create stunning images with AI." />
-<meta name="theme-color" content="#F7F7F4" />
+<meta name="description" content="Aavora.art is one creative space to write stories, generate cinematic videos, and create stunning images with AI. Three studios: Script, Video and Image." />
+<meta name="theme-color" content="#FAFAF7" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
@@ -14,21 +14,20 @@
      TOKENS
      ============================================================ */
   :root{
-    --bg:#F7F7F4;
-    --tint:#F1F3EE;
+    --bg:#FAFAF7;
     --surface:#FFFFFF;
     --ink:#0D1411;
     --ink-soft:#38423C;
     --muted:#6C7A72;
-    --line:#E3E6DF;
-    --line-strong:#CFD6CD;
+    --line:#E6E9E2;
+    --line-strong:#D2D8CF;
     --emerald:#0F9D6B;
     --emerald-deep:#0B7A54;
-    --emerald-tint:#E7F4ED;
+    --emerald-tint:#E9F4EE;
     --radius-lg:22px;
-    --radius:16px;
-    --shadow-sm:0 1px 2px rgba(13,20,17,.04), 0 10px 26px -20px rgba(13,20,17,.35);
-    --shadow-md:0 30px 60px -42px rgba(13,20,17,.55);
+    --radius:14px;
+    --shadow-sm:0 1px 2px rgba(13,20,17,.04), 0 8px 24px -20px rgba(13,20,17,.35);
+    --shadow-md:0 24px 48px -32px rgba(13,20,17,.5);
     --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   }
 
@@ -56,7 +55,7 @@
   ::selection{background:rgba(15,157,107,.22);color:var(--ink)}
   :focus-visible{outline:2px solid var(--emerald);outline-offset:3px;border-radius:8px}
 
-  .shell{width:min(100% - 48px,1160px);margin-inline:auto}
+  .shell{width:min(100% - 48px,1140px);margin-inline:auto}
 
   /* ============================================================
      BUTTONS
@@ -84,19 +83,24 @@
   .btn-ghost:hover{transform:translateY(-2px);border-color:var(--line-strong)}
   .btn-google{
     background:var(--surface);border-color:var(--line);color:var(--ink);
-    font-weight:500;padding:11px 16px;box-shadow:var(--shadow-sm);
+    font-weight:500;font-size:.86rem;padding:10px 14px;box-shadow:var(--shadow-sm);
   }
-  .btn-google:hover{transform:translateY(-1px);box-shadow:0 14px 24px -18px rgba(13,20,17,.7)}
-  .btn-google svg{width:16px;height:16px;flex:none}
-  .btn-block{width:100%}
-  .btn svg.arrow{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .btn-google:hover{transform:translateY(-1px);box-shadow:0 12px 22px -16px rgba(13,20,17,.7)}
+  .btn-google svg{width:15px;height:15px;flex:none}
+  .btn-lg{padding:14px 22px;font-size:.95rem}
+  .btn svg.arrow{
+    width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;
+    transition:transform .2s ease;
+  }
+  .btn:hover svg.arrow{transform:translateX(3px)}
 
   /* ============================================================
-     HEADER / NAV
+     HEADER
      ============================================================ */
   .site-header{
     position:sticky;top:0;z-index:100;
-    background:rgba(247,247,244,.82);
+    background:rgba(250,250,247,.85);
     -webkit-backdrop-filter:blur(14px) saturate(140%);
     backdrop-filter:blur(14px) saturate(140%);
     border-bottom:1px solid transparent;
@@ -104,7 +108,7 @@
   }
   .site-header.is-scrolled{
     border-bottom-color:var(--line);
-    box-shadow:0 18px 30px -30px rgba(13,20,17,.6);
+    box-shadow:0 18px 30px -30px rgba(13,20,17,.55);
   }
   .nav-shell{display:flex;align-items:center;justify-content:space-between;gap:22px;height:70px}
 
@@ -124,7 +128,6 @@
     transition:color .2s ease, background .2s ease;
   }
   .nav-links a:hover{color:var(--ink);background:rgba(13,20,17,.05)}
-  .nav-links a.is-active{color:var(--emerald-deep);background:var(--emerald-tint)}
 
   .nav-actions{display:flex;align-items:center;gap:10px}
 
@@ -147,7 +150,7 @@
   .mobile-nav{
     display:none;flex-direction:column;gap:2px;
     padding:6px 24px 20px;
-    background:rgba(247,247,244,.99);
+    background:rgba(250,250,247,.99);
     border-top:1px solid var(--line);
   }
   .mobile-nav.is-open{display:flex}
@@ -155,32 +158,37 @@
     padding:13px 4px;font-size:.95rem;font-weight:500;color:var(--ink-soft);
     border-bottom:1px solid rgba(13,20,17,.06);
   }
-  .mobile-nav a.is-active{color:var(--emerald-deep)}
   .mobile-nav .btn{margin-top:14px}
-
-  /* ============================================================
-     VIEWS
-     ============================================================ */
-  .view{display:none}
-  .view.is-active{display:block;animation:viewIn .4s cubic-bezier(.2,.7,.3,1) both}
-  @keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
   /* ============================================================
      HERO
      ============================================================ */
-  .hero{padding:66px 0 76px;position:relative;overflow:hidden}
-  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:56px;align-items:center}
+  .hero{padding:72px 0 84px;position:relative;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(rgba(13,20,17,.06) 1px, transparent 1px);
+    background-size:24px 24px;
+    -webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 30%, #000 10%, transparent 70%);
+    mask-image:radial-gradient(ellipse 70% 60% at 50% 30%, #000 10%, transparent 70%);
+  }
+  .hero-grid{
+    position:relative;z-index:1;
+    display:grid;grid-template-columns:1.03fr .97fr;gap:56px;align-items:center;
+  }
 
   .eyebrow{
     display:inline-flex;align-items:center;gap:8px;
-    font-size:.74rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
     color:var(--emerald-deep);background:var(--emerald-tint);
     border:1px solid rgba(15,157,107,.18);
     padding:6px 12px;border-radius:999px;
   }
-  .eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 3px rgba(15,157,107,.16)}
+  .eyebrow-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--emerald);
+    box-shadow:0 0 0 3px rgba(15,157,107,.16);
+  }
 
-  .hero h1{font-size:clamp(2.45rem,5.1vw,3.95rem);margin:22px 0 18px;letter-spacing:-.042em}
+  .hero h1{font-size:clamp(2.5rem,5.2vw,4rem);margin:22px 0 18px;letter-spacing:-.042em}
   .hero h1 em{
     font-family:'Instrument Serif',Georgia,'Times New Roman',serif;
     font-style:italic;font-weight:400;letter-spacing:-.01em;
@@ -189,55 +197,56 @@
   .hero-lede{color:var(--muted);font-size:1.06rem;max-width:50ch}
   .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
 
-  /* --- Hero visual composition --- */
+  /* --- Hero visual --- */
   .hero-visual{position:relative}
   .visual-frame{
-    position:relative;aspect-ratio:1/.92;border-radius:28px;overflow:hidden;
+    position:relative;aspect-ratio:1/.94;border-radius:26px;overflow:hidden;
     border:1px solid var(--line);
-    background:linear-gradient(155deg,#FFFFFF 0%,#F2F6F1 55%,#E9F2EC 100%);
+    background:linear-gradient(155deg,#FFFFFF 0%,#F3F7F1 55%,#E9F2EC 100%);
     box-shadow:0 50px 90px -70px rgba(13,20,17,.85), 0 1px 0 #fff inset;
+  }
+  .visual-glow{
+    position:absolute;left:10%;top:-10%;width:80%;height:80%;
+    background:radial-gradient(circle at 50% 40%, rgba(15,157,107,.26), transparent 66%);
+    filter:blur(22px);pointer-events:none;
   }
   .visual-grid{
     position:absolute;inset:0;
-    background-image:radial-gradient(rgba(13,20,17,.09) 1px, transparent 1px);
+    background-image:radial-gradient(rgba(13,20,17,.08) 1px, transparent 1px);
     background-size:22px 22px;
-    -webkit-mask-image:radial-gradient(circle at 50% 45%, #000 10%, transparent 74%);
-    mask-image:radial-gradient(circle at 50% 45%, #000 10%, transparent 74%);
+    -webkit-mask-image:radial-gradient(circle at 50% 45%, #000 10%, transparent 72%);
+    mask-image:radial-gradient(circle at 50% 45%, #000 10%, transparent 72%);
   }
-  .visual-glow{
-    position:absolute;left:8%;top:-8%;width:78%;height:78%;
-    background:radial-gradient(circle at 50% 40%, rgba(15,157,107,.24), transparent 66%);
-    filter:blur(24px);pointer-events:none;
-  }
-  .visual-card{
+
+  .v-card{
     position:absolute;background:var(--surface);
-    border:1px solid var(--line);border-radius:15px;
+    border:1px solid var(--line);border-radius:14px;
     padding:12px 13px;display:flex;flex-direction:column;gap:9px;
     box-shadow:0 24px 44px -32px rgba(13,20,17,.75);
     will-change:transform;
   }
-  .vc-label{font-size:.68rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
-  .vc-script{width:54%;left:7%;top:14%;animation:float 9s ease-in-out infinite}
-  .vc-video{width:44%;right:7%;top:40%;animation:float 11s ease-in-out infinite .7s}
-  .vc-image{width:48%;left:15%;bottom:11%;animation:float 10s ease-in-out infinite 1.3s}
+  .v-label{font-size:.66rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .v-script{width:56%;left:7%;top:15%;animation:float 9s ease-in-out infinite}
+  .v-video{width:46%;right:7%;top:41%;animation:float 11s ease-in-out infinite .7s}
+  .v-image{width:48%;left:16%;bottom:12%;animation:float 10s ease-in-out infinite 1.3s}
 
-  .vc-lines{display:flex;flex-direction:column;gap:6px}
-  .vc-lines i{display:block;height:6px;border-radius:3px;background:linear-gradient(90deg,#E4EBE5,#EFF3EF)}
-  .vc-lines i:nth-child(1){width:100%}
-  .vc-lines i:nth-child(2){width:84%}
-  .vc-lines i:nth-child(3){width:66%}
-  .vc-lines i:nth-child(4){width:90%}
+  .v-lines{display:flex;flex-direction:column;gap:6px}
+  .v-lines i{display:block;height:6px;border-radius:3px;background:linear-gradient(90deg,#E6EDE8,#F1F5F1)}
+  .v-lines i:nth-child(1){width:100%}
+  .v-lines i:nth-child(2){width:84%}
+  .v-lines i:nth-child(3){width:66%}
+  .v-lines i:nth-child(4){width:90%}
 
-  .vc-play{
-    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  .v-play{
+    width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
     background:var(--emerald-deep);box-shadow:0 10px 20px -10px rgba(11,122,84,1);
   }
-  .vc-play svg{width:12px;height:12px;fill:#fff}
-  .vc-timeline{position:relative;height:5px;border-radius:3px;background:#EAF0EB;overflow:hidden}
-  .vc-timeline::after{content:"";position:absolute;inset:0 45% 0 0;background:var(--emerald);border-radius:3px}
+  .v-play svg{width:11px;height:11px;fill:#fff}
+  .v-timeline{position:relative;height:5px;border-radius:3px;background:#EAF0EB;overflow:hidden}
+  .v-timeline::after{content:"";position:absolute;inset:0 45% 0 0;background:var(--emerald);border-radius:3px}
 
-  .vc-thumb{
-    height:62px;border-radius:10px;
+  .v-thumb{
+    height:58px;border-radius:10px;
     background:
       radial-gradient(circle at 24% 22%, rgba(255,255,255,.75), transparent 55%),
       radial-gradient(circle at 78% 76%, rgba(167,243,208,.9), transparent 58%),
@@ -252,66 +261,64 @@
   /* ============================================================
      SECTION BASICS
      ============================================================ */
-  .section{padding:78px 0}
-  .section-head{max-width:620px;margin-bottom:42px}
-  .section-head h2{font-size:clamp(1.6rem,3vw,2.25rem);margin:16px 0 12px}
+  .section{padding:80px 0}
+  .section-head{max-width:640px;margin-bottom:42px}
+  .section-head h2{font-size:clamp(1.65rem,3vw,2.3rem);margin:16px 0 12px}
   .section-head p{color:var(--muted);font-size:1rem}
-
-  .section-tint{background:var(--tint);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .section-tint{background:#F3F5EE;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 
   /* ============================================================
      STUDIO CARDS
      ============================================================ */
-  .studio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .studio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
   .studio-card{
+    position:relative;display:flex;flex-direction:column;
     background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
-    overflow:hidden;display:flex;flex-direction:column;
+    overflow:hidden;
     transition:transform .32s cubic-bezier(.2,.7,.3,1), box-shadow .32s ease, border-color .3s ease;
   }
-  .studio-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);border-color:var(--line-strong)}
+  .studio-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-md);border-color:var(--line-strong)}
 
-  .studio-preview{
-    position:relative;aspect-ratio:16/10;overflow:hidden;
-    border-bottom:1px solid var(--line);
+  .card-preview{position:relative;aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--line)}
+  .card-num{
+    position:absolute;top:12px;right:14px;z-index:2;
+    font-size:.68rem;font-weight:700;letter-spacing:.14em;
+    color:var(--muted);
   }
 
   /* Script preview */
   .preview-script{
-    background:linear-gradient(160deg,#F8FBF8,#EEF3EF);
+    background:linear-gradient(160deg,#F8FBF8,#EDF2EE);
     display:grid;place-items:center;padding:22px;
   }
-  .ps-paper{
-    width:80%;background:#fff;border:1px solid var(--line);border-radius:12px;
+  .paper{
+    width:82%;background:#fff;border:1px solid var(--line);border-radius:12px;
     padding:16px 14px;display:flex;flex-direction:column;gap:8px;
     box-shadow:0 16px 32px -26px rgba(13,20,17,.75);
   }
-  .ps-line{display:block;height:6px;border-radius:3px;background:#E7EDE8}
-  .ps-line.w-90{width:90%}
-  .ps-line.w-72{width:72%}
-  .ps-line.w-82{width:82%}
-  .ps-line.w-54{width:54%;background:var(--emerald-tint)}
-  .ps-tag{
-    position:absolute;top:12px;left:12px;
-    font-size:.64rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-    color:var(--emerald-deep);background:rgba(255,255,255,.9);
-    border:1px solid rgba(15,157,107,.25);
-    padding:4px 9px;border-radius:999px;
-  }
+  .paper .line{display:block;height:6px;border-radius:3px;background:#E7EDE8}
+  .paper .line.w-90{width:90%}
+  .paper .line.w-72{width:72%}
+  .paper .line.w-82{width:82%}
+  .paper .line.accent{width:54%;background:var(--emerald-tint)}
 
   /* Video preview */
   .preview-video{
     background:linear-gradient(150deg,#0E1A15,#12332A 58%,#0B7A54);
     display:grid;place-items:center;
   }
-  .pv-play{
-    width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+  .preview-video .play{
+    width:52px;height:52px;border-radius:50%;display:grid;place-items:center;
     background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);
     -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
     box-shadow:0 18px 30px -20px rgba(0,0,0,.9);
   }
-  .pv-play svg{width:15px;height:15px;fill:#fff}
-  .pv-bar{position:absolute;left:16px;right:16px;bottom:14px;height:4px;border-radius:2px;background:rgba(255,255,255,.24)}
-  .pv-bar::after{content:"";position:absolute;inset:0 56% 0 0;background:#34D399;border-radius:2px}
+  .preview-video .play svg{width:15px;height:15px;fill:#fff}
+  .preview-video .bar{
+    position:absolute;left:16px;right:16px;bottom:14px;height:4px;border-radius:2px;
+    background:rgba(255,255,255,.24);
+  }
+  .preview-video .bar::after{content:"";position:absolute;inset:0 56% 0 0;background:#34D399;border-radius:2px}
 
   /* Image preview */
   .preview-image{
@@ -321,24 +328,25 @@
       radial-gradient(110% 110% at 86% 84%, rgba(11,122,84,.95), transparent 60%),
       linear-gradient(140deg,#D6EAE0,#EDF4EF);
   }
-  .pi-orb{
+  .preview-image .orb{
     width:46%;aspect-ratio:1;border-radius:50%;
     background:radial-gradient(circle at 34% 28%, #FFFFFF, #A7F3D0 44%, #0F9D6B 100%);
     box-shadow:0 26px 46px -26px rgba(11,122,84,.9);
-    animation:float 8s ease-in-out infinite;
   }
 
-  .studio-body{padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
-  .studio-body h3{font-size:1.15rem}
-  .studio-body p{color:var(--muted);font-size:.94rem;flex:1}
-  .btn-card{
-    margin-top:8px;width:100%;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    background:var(--ink);color:#fff;font-size:.88rem;font-weight:600;
-    padding:13px 16px;border-radius:12px;
-    transition:background .22s ease, transform .18s ease, box-shadow .25s ease;
+  .studio-body{padding:22px 22px 24px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .studio-body h3{font-size:1.15rem;letter-spacing:-.02em}
+  .studio-body p{color:var(--muted);font-size:.92rem;flex:1}
+  .studio-link{
+    margin-top:14px;display:inline-flex;align-items:center;gap:8px;
+    font-size:.87rem;font-weight:600;color:var(--emerald-deep);
   }
-  .btn-card:hover{background:var(--emerald-deep);transform:translateY(-1px);box-shadow:0 16px 26px -18px rgba(11,122,84,1)}
+  .studio-link svg{
+    width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;
+    transition:transform .2s ease;
+  }
+  .studio-card:hover .studio-link svg{transform:translateX(4px)}
 
   /* ============================================================
      WORKFLOW
@@ -354,130 +362,13 @@
     background:var(--emerald-tint);color:var(--emerald-deep);
     font-size:.76rem;font-weight:700;letter-spacing:.06em;
   }
-  .step h3{font-size:1.02rem;margin-bottom:6px}
-  .step p{color:var(--muted);font-size:.92rem}
-
-  /* ============================================================
-     STUDIO VIEWS
-     ============================================================ */
-  .studio-shell{padding:40px 0 84px}
-  .back-link{
-    display:inline-flex;align-items:center;gap:7px;
-    font-size:.86rem;font-weight:500;color:var(--muted);
-    margin-bottom:26px;transition:color .2s ease;
-  }
-  .back-link:hover{color:var(--ink)}
-  .back-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-
-  .studio-head{max-width:660px;margin-bottom:32px}
-  .studio-head h1{font-size:clamp(1.85rem,3.6vw,2.55rem);margin:16px 0 12px}
-  .studio-head p{color:var(--muted);font-size:1rem}
-
-  .workspace{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:22px;align-items:start}
-
-  .panel{
-    background:var(--surface);border:1px solid var(--line);border-radius:20px;
-    padding:22px;box-shadow:var(--shadow-sm);
-  }
-
-  .field{margin-bottom:16px}
-  .field:last-of-type{margin-bottom:0}
-  .field label{
-    display:block;margin-bottom:8px;
-    font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--muted);
-  }
-  .field textarea,.field select{
-    width:100%;font:inherit;font-size:.94rem;color:var(--ink);
-    background:#FBFCFA;border:1px solid var(--line);border-radius:12px;
-    padding:12px 14px;line-height:1.55;
-    transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
-  }
-  .field textarea{min-height:118px;resize:vertical}
-  .field select{appearance:none;cursor:pointer;
-    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%236C7A72' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
-  }
-  .field textarea::placeholder{color:#9AA6A0}
-  .field textarea:focus,.field select:focus{
-    outline:none;border-color:var(--emerald);
-    box-shadow:0 0 0 4px rgba(15,157,107,.12);background:#fff;
-  }
-
-  .chip-row{display:flex;flex-wrap:wrap;gap:8px}
-  .chip{
-    font-size:.82rem;font-weight:500;color:var(--ink-soft);
-    background:#FBFCFA;border:1px solid var(--line);
-    padding:8px 14px;border-radius:999px;
-    transition:background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
-  }
-  .chip:hover{border-color:var(--line-strong);transform:translateY(-1px)}
-  .chip.is-selected{
-    background:var(--emerald-tint);border-color:rgba(15,157,107,.42);color:var(--emerald-deep);
-  }
-
-  .panel-note{
-    font-size:.78rem;line-height:1.55;color:var(--muted);
-    margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
-  }
-
-  .preview-panel{
-    background:var(--surface);border:1px solid var(--line);border-radius:20px;
-    padding:18px;min-height:360px;display:flex;flex-direction:column;
-    box-shadow:var(--shadow-sm);
-  }
-  .preview-head{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    padding-bottom:14px;border-bottom:1px solid var(--line);
-    font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
-  }
-  .pill{
-    font-size:.7rem;font-weight:500;letter-spacing:0;text-transform:none;
-    color:var(--muted);background:#F4F6F3;border:1px solid var(--line);
-    padding:4px 10px;border-radius:999px;
-  }
-  .preview-stage{
-    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:18px;padding:28px 10px;text-align:center;
-  }
-  .stage-skeleton{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
-  .stage-skeleton span{
-    display:block;height:10px;border-radius:5px;
-    background:linear-gradient(90deg,#EEF2EE,#F7F9F6,#EEF2EE);
-    background-size:200% 100%;
-    animation:shimmer 1.8s linear infinite;
-  }
-  .stage-skeleton span:nth-child(1){width:92%}
-  .stage-skeleton span:nth-child(2){width:74%}
-  .stage-skeleton span:nth-child(3){width:84%}
-  .stage-skeleton span:nth-child(4){width:58%}
-  @keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
-  .stage-label{font-size:.86rem;color:var(--muted);max-width:34ch}
-
-  /* Video stage placeholder */
-  .stage-frame{
-    width:100%;max-width:360px;aspect-ratio:16/9;border-radius:14px;
-    background:linear-gradient(150deg,#0E1A15,#12332A 58%,#0B7A54);
-    display:grid;place-items:center;position:relative;overflow:hidden;
-  }
-  .stage-frame .pv-play{opacity:.75}
-
-  /* Image stage placeholder */
-  .stage-canvas{
-    width:100%;max-width:280px;aspect-ratio:1;border-radius:14px;
-    background:
-      radial-gradient(120% 120% at 20% 12%, rgba(52,211,153,.55), transparent 58%),
-      radial-gradient(110% 110% at 84% 82%, rgba(11,122,84,.6), transparent 60%),
-      linear-gradient(140deg,#E7F1EA,#F5F8F4);
-    border:1px solid var(--line);
-    display:grid;place-items:center;
-  }
-  .stage-canvas svg{width:34px;height:34px;stroke:#9DB5A9;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .step h3{font-size:1rem;margin-bottom:6px}
+  .step p{color:var(--muted);font-size:.9rem}
 
   /* ============================================================
      FOOTER
      ============================================================ */
-  .site-footer{background:var(--tint);border-top:1px solid var(--line);padding:32px 0}
+  .site-footer{background:#F3F5EE;border-top:1px solid var(--line);padding:32px 0}
   .footer-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px}
   .footer-links{display:flex;flex-wrap:wrap;gap:24px;font-size:.87rem;color:var(--muted)}
   .footer-links a{transition:color .2s ease}
@@ -507,7 +398,6 @@
     .hero-grid{grid-template-columns:1fr;gap:44px}
     .hero-visual{max-width:520px;width:100%;margin-inline:auto}
     .studio-grid{grid-template-columns:1fr 1fr}
-    .workspace{grid-template-columns:1fr}
   }
   @media (max-width:880px){
     .nav-links{display:none}
@@ -520,7 +410,6 @@
     .section{padding:56px 0}
     .studio-grid{grid-template-columns:1fr}
     .steps{grid-template-columns:1fr}
-    .studio-shell{padding:28px 0 64px}
     .footer-inner{flex-direction:column;align-items:flex-start;gap:16px}
     .hero-actions .btn{width:100%}
   }
@@ -546,7 +435,7 @@
      ============================================================ -->
 <header class="site-header" id="siteHeader">
   <div class="shell nav-shell">
-    <a class="brand" href="#home" data-view="home" aria-label="Aavora.art home">
+    <a class="brand" href="index.html" aria-label="Aavora.art home">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
       </span>
@@ -554,13 +443,13 @@
     </a>
 
     <nav class="nav-links" aria-label="Studios">
-      <a href="#script" data-view="script">Script Studio</a>
-      <a href="#video" data-view="video">Video Studio</a>
-      <a href="#image" data-view="image">Image Studio</a>
+      <a href="script-studio.html">Script Studio</a>
+      <a href="video-studio.html">Video Studio</a>
+      <a href="image-studio.html">Image Studio</a>
     </nav>
 
     <div class="nav-actions">
-      <button class="btn btn-google" type="button" data-google>
+      <button class="btn btn-google" type="button" data-toast="Google Sign-In is not connected yet. Add your OAuth client to enable accounts.">
         <svg viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
           <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -578,17 +467,12 @@
   </div>
 
   <div class="mobile-nav" id="mobileNav">
-    <a href="#script" data-view="script">Script Studio</a>
-    <a href="#video" data-view="video">Video Studio</a>
-    <a href="#image" data-view="image">Image Studio</a>
-    <button class="btn btn-google btn-block" type="button" data-google>
-      <svg viewBox="0 0 48 48" aria-hidden="true">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      <span>Sign in with Google</span>
+    <a href="script-studio.html">Script Studio</a>
+    <a href="video-studio.html">Video Studio</a>
+    <a href="image-studio.html">Image Studio</a>
+    <button class="btn btn-google" type="button" data-toast="Google Sign-In is not connected yet. Add your OAuth client to enable accounts."
+            style="width:100%;justify-content:center;margin-top:14px;">
+      Sign in with Google
     </button>
   </div>
 </header>
@@ -596,370 +480,154 @@
 <main>
 
   <!-- ==========================================================
-       HOME VIEW
+       HERO
        ========================================================== -->
-  <div class="view is-active" id="view-home">
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>AI Creation Platform</span>
 
-    <!-- HERO -->
-    <section class="hero">
-      <div class="shell hero-grid">
-        <div class="hero-copy">
-          <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>AI Creation Platform</span>
+        <h1>Your Ideas. Your Stories. <em>Your Visuals.</em></h1>
 
-          <h1>Your Ideas. Your Stories. <em>Your Visuals.</em></h1>
+        <p class="hero-lede">
+          One creative space to write stories, generate cinematic videos,
+          and create stunning images with AI.
+        </p>
 
-          <p class="hero-lede">
-            One creative space to write stories, generate cinematic videos,
-            and create stunning images with AI.
-          </p>
-
-          <div class="hero-actions">
-            <button class="btn btn-primary" type="button" data-view="script">
-              Start Creating
-              <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </button>
-            <a class="btn btn-ghost" href="#studios">Explore Studios</a>
-          </div>
-        </div>
-
-        <div class="hero-visual" aria-hidden="true">
-          <div class="visual-frame">
-            <div class="visual-grid"></div>
-            <div class="visual-glow"></div>
-
-            <div class="visual-card vc-script">
-              <span class="vc-label">Script</span>
-              <span class="vc-lines"><i></i><i></i><i></i><i></i></span>
-            </div>
-
-            <div class="visual-card vc-video">
-              <span class="vc-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-              <span class="vc-timeline"></span>
-              <span class="vc-label">Video</span>
-            </div>
-
-            <div class="visual-card vc-image">
-              <span class="vc-thumb"></span>
-              <span class="vc-label">Image</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- STUDIOS -->
-    <section class="section" id="studios">
-      <div class="shell">
-        <div class="section-head">
-          <span class="eyebrow">Three studios</span>
-          <h2>Pick a studio and start creating.</h2>
-          <p>Everything you need to take an idea from the first line to the final frame.</p>
-        </div>
-
-        <div class="studio-grid">
-
-          <!-- Script Studio -->
-          <article class="studio-card">
-            <div class="studio-preview preview-script">
-              <span class="ps-tag">Draft</span>
-              <div class="ps-paper">
-                <span class="ps-line w-90"></span>
-                <span class="ps-line w-72"></span>
-                <span class="ps-line w-82"></span>
-                <span class="ps-line w-54"></span>
-              </div>
-            </div>
-            <div class="studio-body">
-              <h3>Script Studio</h3>
-              <p>Turn your story ideas into structured scripts.</p>
-              <button class="btn-card" type="button" data-view="script">
-                Open Script Studio
-                <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </button>
-            </div>
-          </article>
-
-          <!-- Video Studio -->
-          <article class="studio-card">
-            <div class="studio-preview preview-video">
-              <span class="pv-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-              <span class="pv-bar"></span>
-            </div>
-            <div class="studio-body">
-              <h3>Video Studio</h3>
-              <p>Bring your ideas and images to life with AI video generation.</p>
-              <button class="btn-card" type="button" data-view="video">
-                Open Video Studio
-                <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </button>
-            </div>
-          </article>
-
-          <!-- Image Studio -->
-          <article class="studio-card">
-            <div class="studio-preview preview-image">
-              <span class="pi-orb"></span>
-            </div>
-            <div class="studio-body">
-              <h3>Image Studio</h3>
-              <p>Create cinematic visuals from text prompts.</p>
-              <button class="btn-card" type="button" data-view="image">
-                Open Image Studio
-                <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </button>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- WORKFLOW -->
-    <section class="section section-tint">
-      <div class="shell">
-        <div class="section-head">
-          <span class="eyebrow">How it works</span>
-          <h2>Three steps, nothing more.</h2>
-        </div>
-
-        <ol class="steps">
-          <li class="step">
-            <span class="step-num">01</span>
-            <h3>Choose your studio</h3>
-            <p>Pick the space that fits your idea — script, video or image.</p>
-          </li>
-          <li class="step">
-            <span class="step-num">02</span>
-            <h3>Describe your idea</h3>
-            <p>Write a few lines about what you want to create and set the style.</p>
-          </li>
-          <li class="step">
-            <span class="step-num">03</span>
-            <h3>Generate and download</h3>
-            <p>Create your result inside the studio and export it when you're happy.</p>
-          </li>
-        </ol>
-      </div>
-    </section>
-  </div>
-
-  <!-- ==========================================================
-       SCRIPT STUDIO VIEW
-       ========================================================== -->
-  <div class="view" id="view-script">
-    <div class="shell studio-shell">
-      <a class="back-link" href="#home" data-view="home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-        Back to home
-      </a>
-
-      <div class="studio-head">
-        <span class="eyebrow">Script Studio</span>
-        <h1>Turn your story ideas into structured scripts.</h1>
-        <p>Describe the story you have in mind, choose a format and a tone, and build the structure of your script.</p>
-      </div>
-
-      <div class="workspace">
-        <div class="panel">
-          <div class="field">
-            <label for="scriptIdea">Your idea</label>
-            <textarea id="scriptIdea" placeholder="A lighthouse keeper finds a message in a bottle that was written by her future self…"></textarea>
-          </div>
-
-          <div class="field">
-            <label for="scriptFormat">Format</label>
-            <select id="scriptFormat">
-              <option>Short film</option>
-              <option>YouTube video</option>
-              <option>Advertising spot</option>
-              <option>Series episode</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="scriptTone">Tone</label>
-            <select id="scriptTone">
-              <option>Cinematic</option>
-              <option>Warm and human</option>
-              <option>Suspenseful</option>
-              <option>Light and playful</option>
-            </select>
-          </div>
-
-          <button class="btn btn-primary btn-block" type="button" data-generate="script">
-            Generate script
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="script-studio.html">
+            Start Creating
             <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-
-          <p class="panel-note">
-            This studio is a ready-to-build shell. Script generation will be enabled once a
-            script model is connected.
-          </p>
+          </a>
+          <a class="btn btn-ghost btn-lg" href="#studios">Explore Studios</a>
         </div>
+      </div>
 
-        <div class="preview-panel">
-          <div class="preview-head">
-            <span>Preview</span>
-            <span class="pill">Not generated</span>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="visual-frame">
+          <div class="visual-grid"></div>
+          <div class="visual-glow"></div>
+
+          <div class="v-card v-script">
+            <span class="v-label">Script</span>
+            <span class="v-lines"><i></i><i></i><i></i><i></i></span>
           </div>
-          <div class="preview-stage">
-            <div class="stage-skeleton" aria-hidden="true">
-              <span></span><span></span><span></span><span></span>
-            </div>
-            <p class="stage-label">Your structured script will appear here.</p>
+
+          <div class="v-card v-video">
+            <span class="v-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="v-timeline"></span>
+            <span class="v-label">Video</span>
+          </div>
+
+          <div class="v-card v-image">
+            <span class="v-thumb"></span>
+            <span class="v-label">Image</span>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- ==========================================================
-       VIDEO STUDIO VIEW
+       STUDIOS
        ========================================================== -->
-  <div class="view" id="view-video">
-    <div class="shell studio-shell">
-      <a class="back-link" href="#home" data-view="home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-        Back to home
-      </a>
-
-      <div class="studio-head">
-        <span class="eyebrow">Video Studio</span>
-        <h1>Bring your ideas and images to life with AI video generation.</h1>
-        <p>Describe the scene, pick a look and a duration, then bring your visuals into motion.</p>
+  <section class="section" id="studios">
+    <div class="shell">
+      <div class="section-head">
+        <span class="eyebrow">Three studios</span>
+        <h2>Pick a studio and start creating.</h2>
+        <p>Everything you need to take an idea from the first line to the final frame.</p>
       </div>
 
-      <div class="workspace">
-        <div class="panel">
-          <div class="field">
-            <label for="videoPrompt">Scene description</label>
-            <textarea id="videoPrompt" placeholder="Slow dolly through a rain-soaked neon street, reflections on the pavement, cinematic…"></textarea>
-          </div>
+      <div class="studio-grid">
 
-          <div class="field">
-            <label>Look</label>
-            <div class="chip-row" data-chip-group>
-              <button class="chip is-selected" type="button">Cinematic</button>
-              <button class="chip" type="button">Documentary</button>
-              <button class="chip" type="button">Anime</button>
-              <button class="chip" type="button">Product</button>
+        <!-- Script Studio -->
+        <a class="studio-card" href="script-studio.html">
+          <div class="card-preview preview-script">
+            <span class="card-num">01</span>
+            <div class="paper">
+              <span class="line w-90"></span>
+              <span class="line w-72"></span>
+              <span class="line w-82"></span>
+              <span class="line accent"></span>
             </div>
           </div>
-
-          <div class="field">
-            <label for="videoAspect">Aspect ratio</label>
-            <select id="videoAspect">
-              <option>16:9 — Landscape</option>
-              <option>9:16 — Portrait</option>
-              <option>1:1 — Square</option>
-            </select>
+          <div class="studio-body">
+            <h3>Script Studio</h3>
+            <p>Turn your story ideas into structured scripts.</p>
+            <span class="studio-link">
+              Open Script Studio
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
           </div>
+        </a>
 
-          <div class="field">
-            <label for="videoDuration">Duration</label>
-            <select id="videoDuration">
-              <option>4 seconds</option>
-              <option>6 seconds</option>
-              <option>8 seconds</option>
-            </select>
+        <!-- Video Studio -->
+        <a class="studio-card" href="video-studio.html">
+          <div class="card-preview preview-video">
+            <span class="card-num" style="color:rgba(255,255,255,.6)">02</span>
+            <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+            <span class="bar"></span>
           </div>
-
-          <button class="btn btn-primary btn-block" type="button" data-generate="video">
-            Generate video
-            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-
-          <p class="panel-note">
-            This studio is a ready-to-build shell. Video generation will be enabled once a
-            video model is connected.
-          </p>
-        </div>
-
-        <div class="preview-panel">
-          <div class="preview-head">
-            <span>Preview</span>
-            <span class="pill">Not generated</span>
+          <div class="studio-body">
+            <h3>Video Studio</h3>
+            <p>Bring your ideas and images to life with AI video generation.</p>
+            <span class="studio-link">
+              Open Video Studio
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
           </div>
-          <div class="preview-stage">
-            <div class="stage-frame" aria-hidden="true">
-              <span class="pv-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-            </div>
-            <p class="stage-label">Your generated clip will appear here.</p>
+        </a>
+
+        <!-- Image Studio -->
+        <a class="studio-card" href="image-studio.html">
+          <div class="card-preview preview-image">
+            <span class="card-num">03</span>
+            <span class="orb"></span>
           </div>
-        </div>
+          <div class="studio-body">
+            <h3>Image Studio</h3>
+            <p>Create cinematic visuals from text prompts.</p>
+            <span class="studio-link">
+              Open Image Studio
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </div>
+        </a>
+
       </div>
     </div>
-  </div>
+  </section>
 
   <!-- ==========================================================
-       IMAGE STUDIO VIEW
+       WORKFLOW
        ========================================================== -->
-  <div class="view" id="view-image">
-    <div class="shell studio-shell">
-      <a class="back-link" href="#home" data-view="home">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-        Back to home
-      </a>
-
-      <div class="studio-head">
-        <span class="eyebrow">Image Studio</span>
-        <h1>Create cinematic visuals from text prompts.</h1>
-        <p>Describe the image you want, choose a style and a frame, and shape your visuals from a single sentence.</p>
+  <section class="section section-tint">
+    <div class="shell">
+      <div class="section-head">
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps, nothing more.</h2>
       </div>
 
-      <div class="workspace">
-        <div class="panel">
-          <div class="field">
-            <label for="imagePrompt">Prompt</label>
-            <textarea id="imagePrompt" placeholder="A lone figure on a glass cliff at sunrise, soft haze, editorial photography…"></textarea>
-          </div>
-
-          <div class="field">
-            <label>Style</label>
-            <div class="chip-row" data-chip-group>
-              <button class="chip is-selected" type="button">Photographic</button>
-              <button class="chip" type="button">Cinematic</button>
-              <button class="chip" type="button">Illustration</button>
-              <button class="chip" type="button">3D render</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="imageAspect">Aspect ratio</label>
-            <select id="imageAspect">
-              <option>1:1 — Square</option>
-              <option>4:5 — Portrait</option>
-              <option>3:2 — Landscape</option>
-              <option>16:9 — Widescreen</option>
-            </select>
-          </div>
-
-          <button class="btn btn-primary btn-block" type="button" data-generate="image">
-            Generate image
-            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-
-          <p class="panel-note">
-            This studio is a ready-to-build shell. Image generation will be enabled once an
-            image model is connected.
-          </p>
-        </div>
-
-        <div class="preview-panel">
-          <div class="preview-head">
-            <span>Preview</span>
-            <span class="pill">Not generated</span>
-          </div>
-          <div class="preview-stage">
-            <div class="stage-canvas" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M3 16.5l4.6-4.2a2 2 0 012.7 0L21 21"/></svg>
-            </div>
-            <p class="stage-label">Your generated image will appear here.</p>
-          </div>
-        </div>
-      </div>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-num">01</span>
+          <h3>Choose your studio</h3>
+          <p>Pick the space that fits your idea — script, video or image.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">02</span>
+          <h3>Describe your idea</h3>
+          <p>Write a few lines about what you want to create and set the style.</p>
+        </li>
+        <li class="step">
+          <span class="step-num">03</span>
+          <h3>Generate and download</h3>
+          <p>Create your result inside the studio and export it when you're happy.</p>
+        </li>
+      </ol>
     </div>
-  </div>
+  </section>
 
 </main>
 
@@ -968,7 +636,7 @@
      ============================================================ -->
 <footer class="site-footer">
   <div class="shell footer-inner">
-    <a class="brand" href="#home" data-view="home" aria-label="Aavora.art home">
+    <a class="brand" href="index.html" aria-label="Aavora.art home">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
       </span>
@@ -976,9 +644,9 @@
     </a>
 
     <nav class="footer-links" aria-label="Footer">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="contact.html">Contact</a>
     </nav>
 
     <p class="footer-copy">© <span id="year">2025</span> Aavora.art</p>
@@ -992,123 +660,31 @@
 (function () {
   'use strict';
 
-  /* ============================================================
-     VIEW SWITCHING
-     ============================================================ */
-  var views = {
-    home:   document.getElementById('view-home'),
-    script: document.getElementById('view-script'),
-    video:  document.getElementById('view-video'),
-    image:  document.getElementById('view-image')
-  };
-
-  var titles = {
-    home:   'Aavora.art — Your Ideas. Your Stories. Your Visuals.',
-    script: 'Script Studio — Aavora.art',
-    video:  'Video Studio — Aavora.art',
-    image:  'Image Studio — Aavora.art'
-  };
-
-  var navAnchors = document.querySelectorAll('.nav-links a, .mobile-nav a');
-  var mobileNav = document.getElementById('mobileNav');
+  /* ---- Mobile navigation ---- */
   var navToggle = document.getElementById('navToggle');
+  var mobileNav = document.getElementById('mobileNav');
 
-  function closeMobileNav() {
-    mobileNav.classList.remove('is-open');
-    navToggle.setAttribute('aria-expanded', 'false');
-  }
-
-  function syncNav(name) {
-    Array.prototype.forEach.call(navAnchors, function (a) {
-      var active = a.getAttribute('data-view') === name;
-      a.classList.toggle('is-active', active);
-      if (active) {
-        a.setAttribute('aria-current', 'page');
-      } else {
-        a.removeAttribute('aria-current');
-      }
-    });
-  }
-
-  function showView(name, push) {
-    if (!views[name]) name = 'home';
-
-    Object.keys(views).forEach(function (key) {
-      views[key].classList.toggle('is-active', key === name);
-    });
-
-    syncNav(name);
-    closeMobileNav();
-    document.title = titles[name];
-
-    if (push) {
-      var url = name === 'home'
-        ? window.location.pathname + window.location.search
-        : '#' + name;
-      history.pushState({ view: name }, '', url);
-    }
-
-    window.scrollTo(0, 0);
-  }
-
-  /* Initial view from URL hash */
-  var initial = (window.location.hash || '').replace('#', '');
-  var startView = views[initial] ? initial : 'home';
-  showView(startView, false);
-  history.replaceState(
-    { view: startView },
-    '',
-    startView === 'home'
-      ? window.location.pathname + window.location.search
-      : '#' + startView
-  );
-
-  /* Delegated navigation */
-  document.addEventListener('click', function (event) {
-    var trigger = event.target.closest ? event.target.closest('[data-view]') : null;
-    if (!trigger) return;
-    event.preventDefault();
-    showView(trigger.getAttribute('data-view'), true);
-  });
-
-  /* Browser back / forward */
-  window.addEventListener('popstate', function (event) {
-    var name = (event.state && event.state.view) ||
-               (window.location.hash || '').replace('#', '') ||
-               'home';
-    showView(name, false);
-  });
-
-  /* ============================================================
-     MOBILE NAV
-     ============================================================ */
   navToggle.addEventListener('click', function () {
     var open = mobileNav.classList.toggle('is-open');
     navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
 
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape') closeMobileNav();
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      mobileNav.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    }
   });
 
-  window.addEventListener('resize', function () {
-    if (window.innerWidth > 880) closeMobileNav();
-  });
-
-  /* ============================================================
-     HEADER SCROLL STATE
-     ============================================================ */
+  /* ---- Header scroll state ---- */
   var header = document.getElementById('siteHeader');
-
   function onScroll() {
     header.classList.toggle('is-scrolled', window.scrollY > 8);
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  /* ============================================================
-     TOAST
-     ============================================================ */
+  /* ---- Toast ---- */
   var toastEl = document.getElementById('toast');
   var toastTimer = null;
 
@@ -1118,47 +694,16 @@
     window.clearTimeout(toastTimer);
     toastTimer = window.setTimeout(function () {
       toastEl.classList.remove('is-visible');
-    }, 4600);
+    }, 4200);
   }
 
-  /* ============================================================
-     GOOGLE SIGN-IN (not connected)
-     ============================================================ */
-  Array.prototype.forEach.call(document.querySelectorAll('[data-google]'), function (btn) {
-    btn.addEventListener('click', function () {
-      showToast('Google Sign-In is not connected yet. Add your OAuth client to enable accounts.');
+  document.querySelectorAll('[data-toast]').forEach(function (el) {
+    el.addEventListener('click', function () {
+      showToast(el.getAttribute('data-toast'));
     });
   });
 
-  /* ============================================================
-     STUDIO GENERATE BUTTONS (not connected)
-     ============================================================ */
-  var studioNames = { script: 'Script', video: 'Video', image: 'Image' };
-
-  Array.prototype.forEach.call(document.querySelectorAll('[data-generate]'), function (btn) {
-    btn.addEventListener('click', function () {
-      var studio = btn.getAttribute('data-generate');
-      var label = studioNames[studio] || 'Studio';
-      showToast(label + ' generation is not connected yet. This studio is ready for your model API.');
-    });
-  });
-
-  /* ============================================================
-     CHIP SELECTION (style pickers)
-     ============================================================ */
-  Array.prototype.forEach.call(document.querySelectorAll('[data-chip-group]'), function (group) {
-    group.addEventListener('click', function (event) {
-      var chip = event.target.closest ? event.target.closest('.chip') : null;
-      if (!chip) return;
-      Array.prototype.forEach.call(group.querySelectorAll('.chip'), function (item) {
-        item.classList.toggle('is-selected', item === chip);
-      });
-    });
-  });
-
-  /* ============================================================
-     FOOTER YEAR
-     ============================================================ */
+  /* ---- Footer year ---- */
   document.getElementById('year').textContent = new Date().getFullYear();
 })();
 </script>
