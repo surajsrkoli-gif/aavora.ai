@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Video Studio — Aavora.art</title>
+<meta name="description" content="Aavora.art Video Studio — bring your ideas and images to life with AI video generation." />
+<meta name="theme-color" content="#FBFCFA" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============================================================
+     1. DESIGN TOKENS
+     ============================================================ */
+  :root{
+    --bg:#FBFCFA;
+    --tint:#F2F5EF;
+    --surface:#FFFFFF;
+
+    --ink:#0B1210;
+    --ink-soft:#35413B;
+    --muted:#68746D;
+
+    --line:#E5E9E3;
+    --line-strong:#D0D7CE;
+
+    --emerald:#0E9F6E;
+    --emerald-deep:#0A7A54;
+    --emerald-tint:#E8F5EE;
+
+    --danger:#B42318;
+    --danger-tint:#FDECEA;
+
+    --warn:#946200;
+    --warn-tint:#FDF6E3;
+
+    --radius-xl:24px;
+    --radius-lg:18px;
+    --radius:13px;
+
+    --shadow-sm:0 1px 2px rgba(11,18,16,.04), 0 8px 22px -20px rgba(11,18,16,.38);
+    --shadow-md:0 26px 50px -34px rgba(11,18,16,.55);
+
+    --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --font-serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+    --font-mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+
+    --header-h:70px;
+    --shell:min(100% - 44px, 1120px);
+  }
+
+  /* ============================================================
+     2. RESET / BASE
+     ============================================================ */
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  h1,h2,h3{margin:0;font-weight:600;line-height:1.12;letter-spacing:-.028em}
+  p{margin:0}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  img,svg,video{display:block;max-width:100%}
+  ul,ol{margin:0;padding:0;list-style:none}
+  code{font-family:var(--font-mono)}
+
+  ::selection{background:rgba(14,159,110,.22);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--emerald);outline-offset:3px;border-radius:8px}
+
+  .shell{width:var(--shell);margin-inline:auto}
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  }
+
+  /* ============================================================
+     3. BUTTONS
+     ============================================================ */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    font-size:.9rem;font-weight:600;line-height:1;
+    padding:13px 20px;border-radius:12px;border:1px solid transparent;
+    white-space:nowrap;cursor:pointer;
+    transition:transform .18s ease, background .2s ease, border-color .2s ease,
+               box-shadow .25s ease, color .2s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  .btn-primary{
+    background:var(--emerald-deep);color:#fff;
+    box-shadow:0 12px 24px -16px rgba(10,122,84,.95);
+  }
+  .btn-primary:hover{
+    background:#086446;transform:translateY(-2px);
+    box-shadow:0 18px 30px -18px rgba(10,122,84,1);
+  }
+  .btn-ghost{
+    background:var(--surface);border-color:var(--line);color:var(--ink);
+    box-shadow:var(--shadow-sm);
+  }
+  .btn-ghost:hover{transform:translateY(-2px);border-color:var(--line-strong)}
+  .btn-google{
+    background:var(--surface);border-color:var(--line);color:var(--ink);
+    font-weight:500;font-size:.86rem;padding:10px 14px;box-shadow:var(--shadow-sm);
+  }
+  .btn-google:hover{transform:translateY(-1px);border-color:var(--line-strong)}
+  .btn-google svg{width:15px;height:15px;flex:none}
+  .btn-sm{padding:8px 13px;font-size:.8rem;border-radius:9px}
+  .btn-block{width:100%}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none !important;box-shadow:none}
+
+  .btn svg.arrow{
+    width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;
+    transition:transform .2s ease;
+  }
+  .btn:hover svg.arrow{transform:translateX(3px)}
+
+  .btn.is-loading{pointer-events:none;opacity:.92}
+  .btn.is-loading .arrow{display:none}
+  .btn.is-loading::after{
+    content:"";width:14px;height:14px;
+    border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ============================================================
+     4. HEADER
+     ============================================================ */
+  .site-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(251,252,250,.86);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .site-header.is-scrolled{
+    border-bottom-color:var(--line);
+    box-shadow:0 18px 30px -30px rgba(11,18,16,.55);
+  }
+
+  .nav-shell{display:flex;align-items:center;justify-content:space-between;gap:22px;height:var(--header-h)}
+
+  .brand{display:inline-flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:600;letter-spacing:-.03em}
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(145deg,#13BC83,#0A7A54);
+    box-shadow:0 8px 16px -10px rgba(14,159,110,1), inset 0 0 0 1px rgba(255,255,255,.22);
+  }
+  .brand-mark svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .brand-dot{color:var(--emerald)}
+
+  .nav-links{display:flex;align-items:center;gap:2px}
+  .nav-links a{
+    font-size:.9rem;font-weight:500;color:var(--ink-soft);
+    padding:9px 15px;border-radius:999px;
+    transition:color .2s ease, background .2s ease;
+  }
+  .nav-links a:hover{color:var(--ink);background:rgba(11,18,16,.05)}
+  .nav-links a.is-active{color:var(--emerald-deep);background:var(--emerald-tint)}
+
+  .nav-actions{display:flex;align-items:center;gap:10px}
+
+  .nav-toggle{
+    display:none;width:40px;height:40px;border-radius:11px;
+    border:1px solid var(--line);background:var(--surface);
+    align-items:center;justify-content:center;
+  }
+  .nav-toggle span{position:relative;display:block;width:16px;height:1.6px;border-radius:2px;background:var(--ink);transition:background .2s ease}
+  .nav-toggle span::before,.nav-toggle span::after{
+    content:"";position:absolute;left:0;width:16px;height:1.6px;border-radius:2px;background:var(--ink);
+    transition:transform .25s ease;
+  }
+  .nav-toggle span::before{top:-5px}
+  .nav-toggle span::after{top:5px}
+  .nav-toggle[aria-expanded="true"] span{background:transparent}
+  .nav-toggle[aria-expanded="true"] span::before{transform:translateY(5px) rotate(45deg)}
+  .nav-toggle[aria-expanded="true"] span::after{transform:translateY(-5px) rotate(-45deg)}
+
+  .mobile-nav{
+    display:none;flex-direction:column;gap:2px;
+    padding:6px 22px 20px;
+    background:rgba(251,252,250,.99);
+    border-top:1px solid var(--line);
+  }
+  .mobile-nav.is-open{display:flex}
+  .mobile-nav a{
+    padding:13px 4px;font-size:.95rem;font-weight:500;color:var(--ink-soft);
+    border-bottom:1px solid rgba(11,18,16,.06);
+  }
+  .mobile-nav a.is-active{color:var(--emerald-deep)}
+  .mobile-nav .btn{margin-top:14px;width:100%}
+
+  /* ============================================================
+     5. PAGE HEAD
+     ============================================================ */
+  .page-wrap{padding:34px 0 84px}
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:.86rem;font-weight:500;color:var(--muted);
+    margin-bottom:24px;transition:color .2s ease;
+  }
+  .back-link:hover{color:var(--ink)}
+  .back-link svg{
+    width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  .page-head{max-width:680px;margin-bottom:32px}
+  .page-head h1{font-size:clamp(1.85rem,3.6vw,2.55rem);margin:16px 0 12px}
+  .page-head p{color:var(--muted);font-size:1rem}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--emerald-deep);background:var(--emerald-tint);
+    border:1px solid rgba(14,159,110,.18);
+    padding:6px 12px;border-radius:999px;
+  }
+  .eyebrow-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--emerald);
+    box-shadow:0 0 0 3px rgba(14,159,110,.16);
+  }
+
+  /* ============================================================
+     6. LAYOUT
+     ============================================================ */
+  .video-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,340px);
+    gap:22px;
+    align-items:start;
+  }
+  .video-side{position:sticky;top:calc(var(--header-h) + 18px)}
+
+  .video-form{display:flex;flex-direction:column;gap:16px}
+
+  /* ============================================================
+     7. FORM SECTIONS
+     ============================================================ */
+  .form-section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:22px;
+    box-shadow:var(--shadow-sm);
+  }
+
+  .form-section-head{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-bottom:16px;
+  }
+  .form-section-title{
+    display:flex;align-items:center;gap:10px;margin:0;
+    font-size:.94rem;font-weight:600;letter-spacing:-.01em;
+    color:var(--ink);
+  }
+  .step-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:7px;flex:none;
+    background:var(--emerald-tint);color:var(--emerald-deep);
+    font-size:.68rem;font-weight:700;letter-spacing:.02em;
+  }
+  .form-section-hint{font-size:.82rem;color:var(--muted);margin-top:8px}
+
+  .pill{
+    font-size:.7rem;font-weight:500;letter-spacing:0;text-transform:none;
+    color:var(--muted);background:#F4F6F3;border:1px solid var(--line);
+    padding:3px 9px;border-radius:999px;
+  }
+  .pill.is-warn{
+    color:var(--warn);background:var(--warn-tint);
+    border-color:rgba(148,98,0,.28);
+  }
+
+  /* ============================================================
+     8. STEP 1 — GENERATION MODE
+     ============================================================ */
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .mode-card{
+    position:relative;
+    display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+    text-align:left;
+    padding:16px 15px;
+    background:#FBFCFA;
+    border:1px solid var(--line);
+    border-radius:14px;
+    cursor:pointer;
+    transition:transform .18s ease, border-color .2s ease,
+               background .2s ease, box-shadow .25s ease;
+  }
+  .mode-card:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .mode-card.is-selected{
+    background:var(--emerald-tint);
+    border-color:rgba(14,159,110,.5);
+    box-shadow:0 0 0 3px rgba(14,159,110,.1);
+  }
+
+  .mode-icon{
+    width:34px;height:34px;border-radius:9px;
+    display:grid;place-items:center;
+    background:#fff;border:1px solid var(--line);
+    color:var(--emerald-deep);
+    transition:border-color .2s ease;
+  }
+  .mode-card.is-selected .mode-icon{border-color:rgba(14,159,110,.35)}
+  .mode-icon svg{width:16px;height:16px}
+
+  .mode-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .mode-label{font-size:.93rem;font-weight:600;line-height:1.25}
+  .mode-desc{font-size:.77rem;color:var(--muted);line-height:1.42}
+
+  .mode-check{
+    position:absolute;top:10px;right:10px;
+    width:20px;height:20px;border-radius:50%;
+    display:grid;place-items:center;
+    background:var(--emerald);color:#fff;
+    opacity:0;transform:scale(.6);
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .mode-check svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+  .mode-card.is-selected .mode-check{opacity:1;transform:scale(1)}
+
+  /* ============================================================
+     9. IMAGE UPLOAD (Image to Video only)
+     ============================================================ */
+  .upload-field{margin-top:16px}
+  .upload-field label{
+    display:block;margin-bottom:8px;
+    font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .upload-drop{
+    position:relative;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:8px;
+    border:1.5px dashed var(--line-strong);
+    border-radius:14px;
+    padding:22px 16px;
+    background:#FBFCFA;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .upload-drop:hover{border-color:var(--emerald);background:#F5FAF7}
+  .upload-drop.is-dragging{border-color:var(--emerald);background:var(--emerald-tint)}
+  .upload-drop svg{
+    width:26px;height:26px;stroke:var(--emerald-deep);fill:none;
+    stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
+  }
+  .upload-drop strong{font-size:.9rem;font-weight:600}
+  .upload-drop small{font-size:.78rem;color:var(--muted)}
+  .upload-drop input[type="file"]{
+    position:absolute;inset:0;opacity:0;cursor:pointer;
+  }
+
+  .upload-preview{
+    display:flex;align-items:center;gap:12px;
+    margin-top:12px;padding:10px;
+    background:#FBFCFA;
+    border:1px solid var(--line);
+    border-radius:12px;
+  }
+  .upload-thumb{
+    width:56px;height:56px;border-radius:8px;flex:none;
+    background:#EEF2EE center/cover no-repeat;
+    border:1px solid var(--line);
+  }
+  .upload-meta{min-width:0;flex:1}
+  .upload-meta strong{
+    display:block;font-size:.85rem;font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .upload-meta small{font-size:.76rem;color:var(--muted)}
+  .upload-remove{
+    font-size:.78rem;font-weight:600;color:var(--danger);
+    padding:6px 10px;border-radius:8px;
+    transition:background .2s ease;
+  }
+  .upload-remove:hover{background:var(--danger-tint)}
+
+  /* ============================================================
+     10. FIELDS
+     ============================================================ */
+  .field{margin-bottom:16px}
+  .field:last-of-type{margin-bottom:0}
+
+  .field label{
+    display:block;margin-bottom:8px;
+    font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .field select,
+  .field textarea,
+  .field input[type="text"]{
+    width:100%;font:inherit;font-size:.94rem;color:var(--ink);
+    background:#FBFCFA;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;line-height:1.55;
+    transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .field textarea{min-height:150px;resize:vertical}
+  .field textarea::placeholder,
+  .field input::placeholder{color:#9AA6A0}
+  .field select{
+    appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2368746D' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+  }
+  .field select:focus,
+  .field textarea:focus,
+  .field input[type="text"]:focus{
+    outline:none;border-color:var(--emerald);
+    box-shadow:0 0 0 4px rgba(14,159,110,.12);background:#fff;
+  }
+  .field select:disabled,
+  .field textarea:disabled,
+  .field input:disabled{
+    cursor:not-allowed;opacity:.7;background:#F5F7F3;
+  }
+  .field.has-error textarea,
+  .field.has-error input[type="text"]{
+    border-color:var(--danger);
+    box-shadow:0 0 0 4px rgba(180,35,24,.1);
+  }
+
+  .field-hint{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-size:.78rem;color:var(--muted);margin-top:8px;
+  }
+  .field-hint .counter{font-variant-numeric:tabular-nums}
+
+  .form-row{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+
+  /* Inline warning for no-model */
+  .inline-warn{
+    display:flex;align-items:flex-start;gap:10px;
+    background:var(--warn-tint);
+    border:1px solid rgba(148,98,0,.24);
+    border-radius:11px;
+    padding:12px 14px;
+    color:var(--warn);
+    font-size:.85rem;line-height:1.5;
+    margin-top:12px;
+  }
+  .inline-warn svg{
+    width:16px;height:16px;flex:none;stroke:var(--warn);fill:none;
+    stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:2px;
+  }
+
+  /* ============================================================
+     11. GENERATE BAR
+     ============================================================ */
+  .generate-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:18px 20px;box-shadow:var(--shadow-sm);
+  }
+  .credit-estimate{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .credit-label{
+    font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .credit-value{
+    display:flex;align-items:baseline;gap:5px;
+    font-size:1.3rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);
+  }
+  .credit-value span{font-size:.8rem;font-weight:500;color:var(--muted)}
+  .credit-note{font-size:.74rem;color:var(--muted)}
+  .generate-bar .btn{flex:none}
+
+  /* ============================================================
+     12. STICKY SUMMARY
+     ============================================================ */
+  .summary-panel{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);overflow:hidden;
+  }
+  .summary-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .summary-list{padding:6px 18px 12px;margin:0}
+  .summary-list > div{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:.84rem;
+  }
+  .summary-list > div:last-child{border-bottom:0}
+  .summary-list dt{color:var(--muted);flex:none;font-weight:500}
+  .summary-list dd{
+    margin:0;text-align:right;font-weight:600;color:var(--ink);
+    word-break:break-word;max-width:62%;
+  }
+  .summary-list dd.is-empty{color:#A2AEA7;font-weight:500}
+
+  .summary-credit{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin:0 18px 18px;padding:12px 14px;
+    background:var(--emerald-tint);
+    border:1px solid rgba(14,159,110,.2);
+    border-radius:11px;
+    font-size:.82rem;color:var(--emerald-deep);
+  }
+  .summary-credit strong{
+    font-size:1.05rem;font-weight:700;color:var(--emerald-deep);
+    font-variant-numeric:tabular-nums;
+  }
+  .summary-credit .unit{
+    font-size:.74rem;font-weight:500;color:var(--emerald-deep);
+    opacity:.75;margin-left:3px;
+  }
+
+  /* ============================================================
+     13. RESULT PANEL
+     ============================================================ */
+  .result-panel{
+    margin-top:22px;
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+  .result-head{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .result-tools{display:flex;gap:8px;flex-wrap:wrap}
+  .result-body{padding:20px}
+
+  .result-state{animation:resultIn .28s ease both}
+  @keyframes resultIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .result-empty{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;padding:36px 16px;text-align:center;
+  }
+  .result-empty p{color:var(--muted);font-size:.92rem;max-width:46ch}
+  .result-empty .stage-frame{
+    width:100%;max-width:340px;aspect-ratio:16/9;
+    border-radius:14px;
+    background:linear-gradient(150deg,#0E1A15,#12332A 58%,#0A7A54);
+    display:grid;place-items:center;position:relative;overflow:hidden;
+  }
+  .stage-frame .play{
+    width:48px;height:48px;border-radius:50%;
+    display:grid;place-items:center;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.4);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    box-shadow:0 18px 30px -20px rgba(0,0,0,.9);
+  }
+  .stage-frame .play svg{width:14px;height:14px;fill:#fff}
+
+  .result-loading{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;padding:36px 16px;
+    color:var(--muted);font-size:.9rem;text-align:center;
+  }
+  .spinner-lg{
+    width:30px;height:30px;border-radius:50%;
+    border:3px solid var(--emerald-tint);border-top-color:var(--emerald);
+    animation:spin .8s linear infinite;
+  }
+  .loading-status{
+    font-size:.8rem;color:var(--muted);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .result-error{
+    display:flex;align-items:flex-start;gap:12px;
+    background:var(--danger-tint);border:1px solid rgba(180,35,24,.22);
+    border-radius:12px;padding:16px 18px;
+    color:var(--danger);font-size:.9rem;line-height:1.55;
+  }
+  .result-error svg{
+    width:18px;height:18px;flex:none;stroke:var(--danger);fill:none;
+    stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:2px;
+  }
+
+  .result-done{display:flex;flex-direction:column;gap:14px}
+  .result-meta{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    font-size:.78rem;color:var(--muted);
+  }
+  .result-meta .dot{opacity:.5}
+  .badge-demo{
+    font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--emerald-deep);background:var(--emerald-tint);
+    border:1px solid rgba(14,159,110,.25);
+    padding:3px 9px;border-radius:999px;
+  }
+  .video-frame{
+    width:100%;border-radius:14px;overflow:hidden;
+    background:#0E1A15;
+    border:1px solid var(--line);
+    aspect-ratio:16/9;
+    display:grid;place-items:center;
+  }
+  .video-frame video{
+    width:100%;height:100%;object-fit:contain;background:#0E1A15;
+  }
+  .video-frame.portrait{aspect-ratio:9/16;max-width:340px;margin-inline:auto}
+
+  /* ============================================================
+     14. RECENT GENERATIONS
+     ============================================================ */
+  .recent{margin-top:34px}
+  .recent-head{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    margin-bottom:16px;
+  }
+  .recent-head h2{
+    display:flex;align-items:center;gap:10px;
+    font-size:1.05rem;
+  }
+  .recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  .recent-card{
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:transform .22s ease, border-color .2s ease;
+  }
+  .recent-card:hover{transform:translateY(-3px);border-color:var(--line-strong)}
+  .recent-thumb{
+    aspect-ratio:16/9;
+    background:linear-gradient(150deg,#0E1A15,#12332A 58%,#0A7A54);
+    display:grid;place-items:center;position:relative;
+  }
+  .recent-thumb .play{
+    width:32px;height:32px;border-radius:50%;
+    display:grid;place-items:center;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.4);
+  }
+  .recent-thumb .play svg{width:11px;height:11px;fill:#fff}
+  .recent-body{padding:12px 14px 14px}
+  .recent-body strong{
+    display:block;font-size:.86rem;font-weight:600;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .recent-body small{font-size:.75rem;color:var(--muted)}
+  .recent-body .status-chip{
+    display:inline-block;margin-top:6px;
+    font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);background:#F4F6F3;
+    border:1px solid var(--line);
+    padding:2px 8px;border-radius:999px;
+  }
+
+  /* ============================================================
+     15. FOOTER
+     ============================================================ */
+  .site-footer{background:var(--tint);border-top:1px solid var(--line);padding:34px 0}
+  .footer-inner{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;
+  }
+  .footer-links{display:flex;flex-wrap:wrap;gap:24px;font-size:.87rem;color:var(--muted)}
+  .footer-links a{transition:color .2s ease}
+  .footer-links a:hover{color:var(--ink)}
+  .footer-copy{font-size:.82rem;color:var(--muted)}
+
+  /* ============================================================
+     16. TOAST
+     ============================================================ */
+  .toast{
+    position:fixed;left:50%;bottom:28px;z-index:200;
+    transform:translate(-50%,18px);
+    background:var(--ink);color:#F7FAF7;
+    font-size:.86rem;line-height:1.45;text-align:center;
+    padding:13px 20px;border-radius:12px;
+    max-width:calc(100% - 40px);
+    box-shadow:0 26px 50px -24px rgba(0,0,0,.65);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+  /* ============================================================
+     17. RESPONSIVE
+     ============================================================ */
+  @media (max-width:1080px){
+    .video-layout{grid-template-columns:minmax(0,1fr) minmax(0,310px)}
+  }
+  @media (max-width:1000px){
+    .video-layout{grid-template-columns:1fr}
+    .video-side{position:static}
+    .recent-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:880px){
+    .nav-links{display:none}
+    .nav-toggle{display:inline-flex}
+    .nav-actions .btn-google{display:none}
+  }
+  @media (max-width:760px){
+    .mode-grid{grid-template-columns:1fr}
+    .mode-card{flex-direction:row;align-items:center;gap:14px;padding:14px}
+    .mode-desc{display:none}
+    .mode-check{top:50%;transform:translateY(-50%) scale(.6)}
+    .mode-card.is-selected .mode-check{transform:translateY(-50%) scale(1)}
+    .form-row{grid-template-columns:1fr}
+  }
+  @media (max-width:700px){
+    :root{--shell:calc(100% - 40px)}
+    .page-wrap{padding:24px 0 64px}
+    .footer-inner{flex-direction:column;align-items:flex-start;gap:16px}
+    .generate-bar{flex-direction:column;align-items:stretch}
+    .generate-bar .btn{width:100%}
+    .result-head{flex-direction:column;align-items:flex-start}
+    .result-tools{width:100%}
+    .result-tools .btn{flex:1}
+    .recent-grid{grid-template-columns:1fr}
+  }
+  @media (max-width:420px){
+    .brand{font-size:1rem}
+    .summary-list dd{max-width:65%}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header" id="siteHeader">
+  <div class="shell nav-shell">
+
+    <a class="brand" href="index.html" aria-label="Aavora.art — home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
+      </span>
+      <span>aavora<span class="brand-dot">.art</span></span>
+    </a>
+
+    <nav class="nav-links" aria-label="Studios">
+      <a href="script-studio.html">Script Studio</a>
+      <a href="video-studio.html" class="is-active" aria-current="page">Video Studio</a>
+      <a href="image-studio.html">Image Studio</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn btn-google" type="button" data-auth>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+
+      <button class="nav-toggle" id="navToggle" type="button"
+              aria-label="Toggle navigation menu"
+              aria-expanded="false"
+              aria-controls="mobileNav">
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="script-studio.html">Script Studio</a>
+    <a href="video-studio.html" class="is-active" aria-current="page">Video Studio</a>
+    <a href="image-studio.html">Image Studio</a>
+    <button class="btn btn-google" type="button" data-auth>
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span>Sign in with Google</span>
+    </button>
+  </div>
+</header>
+
+<main class="page-wrap">
+  <div class="shell">
+
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      Back to home
+    </a>
+
+    <div class="page-head">
+      <span class="eyebrow">
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+        Video Studio
+      </span>
+      <h1>Bring your ideas to life with AI video generation.</h1>
+      <p>Describe the scene or start from an image. Choose a model and settings, then send the job to your secure backend.</p>
+    </div>
+
+    <!-- ============================================================
+         VIDEO FORM + STICKY SUMMARY
+         ============================================================ -->
+    <div class="video-layout">
+
+      <!-- ================= FORM ================= -->
+      <form class="video-form" id="videoForm" novalidate>
+
+        <!-- STEP 1 — GENERATION MODE -->
+        <section class="form-section" aria-labelledby="modeTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="modeTitle">
+              <span class="step-badge" aria-hidden="true">1</span>
+              Generation mode
+            </h2>
+            <span class="pill">Pick one</span>
+          </div>
+
+          <div class="mode-grid" id="modeGrid" role="radiogroup" aria-label="Generation mode">
+            <button class="mode-card is-selected" type="button" role="radio"
+                    aria-checked="true" data-mode="text">
+              <span class="mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 6h16M4 12h10M4 18h12"/>
+                </svg>
+              </span>
+              <span class="mode-info">
+                <span class="mode-label">Text to Video</span>
+                <span class="mode-desc">Describe the scene in words</span>
+              </span>
+              <span class="mode-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+            </button>
+
+            <button class="mode-card" type="button" role="radio"
+                    aria-checked="false" data-mode="image">
+              <span class="mode-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="16" rx="2.5"/>
+                  <circle cx="8.5" cy="9.5" r="1.5"/>
+                  <path d="M3 16.5l4.6-4.2a2 2 0 012.7 0L21 21"/>
+                </svg>
+              </span>
+              <span class="mode-info">
+                <span class="mode-label">Image to Video</span>
+                <span class="mode-desc">Animate a still image</span>
+              </span>
+              <span class="mode-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+              </span>
+            </button>
+          </div>
+
+          <!-- Image upload (only for Image to Video) -->
+          <div class="upload-field" id="uploadField" hidden>
+            <label for="imageFile">Source image</label>
+
+            <label class="upload-drop" id="uploadDrop" for="imageFile">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 16V4M6 10l6-6 6 6"/>
+                <path d="M4 20h16"/>
+              </svg>
+              <strong>Click to upload or drag an image</strong>
+              <small>PNG, JPG or WebP · up to 10 MB</small>
+              <input type="file" id="imageFile" accept="image/png,image/jpeg,image/webp" />
+            </label>
+
+            <div class="upload-preview" id="uploadPreview" hidden>
+              <div class="upload-thumb" id="uploadThumb" aria-hidden="true"></div>
+              <div class="upload-meta">
+                <strong id="uploadName">image.png</strong>
+                <small id="uploadSize">—</small>
+              </div>
+              <button class="upload-remove" type="button" id="uploadRemove">Remove</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2 — PROMPT -->
+        <section class="form-section" aria-labelledby="promptTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="promptTitle">
+              <span class="step-badge" aria-hidden="true">2</span>
+              Describe your video
+            </h2>
+            <span class="pill">Required</span>
+          </div>
+
+          <div class="field" id="promptField">
+            <label class="sr-only" for="videoPrompt">Describe your video</label>
+            <textarea
+              id="videoPrompt"
+              maxlength="1500"
+              placeholder="Describe the scene, subject, camera movement, lighting, atmosphere and visual style..."
+              required
+              aria-describedby="promptHint"></textarea>
+            <p class="field-hint" id="promptHint">
+              <span>Be specific about motion, light and mood.</span>
+              <span class="counter"><span id="promptCount">0</span> / 1500</span>
+            </p>
+          </div>
+        </section>
+
+        <!-- STEP 3 — MODEL -->
+        <section class="form-section" aria-labelledby="modelTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="modelTitle">
+              <span class="step-badge" aria-hidden="true">3</span>
+              Model
+            </h2>
+            <span class="pill" id="modelPill">Configurable</span>
+          </div>
+
+          <div class="field">
+            <label for="modelSelect">Video model</label>
+            <select id="modelSelect"></select>
+            <p class="field-hint" id="modelHint">
+              Only models enabled for the configured Google Cloud project are listed.
+            </p>
+          </div>
+
+          <div class="inline-warn" id="modelWarn" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l9 16H3l9-16z"/>
+              <path d="M12 10v4M12 17v.01"/>
+            </svg>
+            <span>No video model configured yet. Add an enabled Google Veo model ID to the config in this file.</span>
+          </div>
+        </section>
+
+        <!-- STEP 4 — SETTINGS -->
+        <section class="form-section" aria-labelledby="settingsTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="settingsTitle">
+              <span class="step-badge" aria-hidden="true">4</span>
+              Video settings
+            </h2>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="aspectSelect">Aspect ratio</label>
+              <select id="aspectSelect" disabled></select>
+              <p class="field-hint" id="aspectHint">Select a model first.</p>
+            </div>
+
+            <div class="field">
+              <label for="durationSelect">Duration</label>
+              <select id="durationSelect" disabled></select>
+              <p class="field-hint" id="durationHint">Select a model first.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="negativePrompt">Negative prompt <span style="text-transform:none;font-weight:500;color:var(--muted);letter-spacing:0;">(optional)</span></label>
+            <input type="text" id="negativePrompt" maxlength="200"
+                   placeholder="Things to avoid — e.g. text, watermarks, distorted faces"
+                   disabled />
+            <p class="field-hint" id="negativeHint">Enabled when the selected model supports it.</p>
+          </div>
+        </section>
+
+        <!-- GENERATE BAR -->
+        <div class="generate-bar">
+          <div class="credit-estimate">
+            <span class="credit-label">Estimated credits</span>
+            <span class="credit-value"><span id="creditValue">—</span><span>credits</span></span>
+            <span class="credit-note">Estimate only — the credit backend is not connected.</span>
+          </div>
+          <button class="btn btn-primary" id="generateBtn" type="submit" disabled>
+            <span class="btn-label">Generate video</span>
+            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- ================= STICKY SUMMARY ================= -->
+      <aside class="video-side" aria-labelledby="summaryTitle">
+        <div class="summary-panel">
+          <div class="summary-head">
+            <span id="summaryTitle">Job summary</span>
+            <span class="pill" id="summaryReady">Not ready</span>
+          </div>
+
+          <dl class="summary-list" aria-live="polite">
+            <div><dt>Mode</dt><dd id="sumMode">Text to Video</dd></div>
+            <div><dt>Model</dt><dd id="sumModel" class="is-empty">Not selected</dd></div>
+            <div><dt>Aspect</dt><dd id="sumAspect" class="is-empty">—</dd></div>
+            <div><dt>Duration</dt><dd id="sumDuration" class="is-empty">—</dd></div>
+            <div><dt>Prompt</dt><dd id="sumPrompt" class="is-empty">—</dd></div>
+            <div><dt>Image</dt><dd id="sumImage" class="is-empty">—</dd></div>
+          </dl>
+
+          <div class="summary-credit">
+            <span>Estimated credits</span>
+            <strong><span id="sumCredit">—</span><span class="unit">credits</span></strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ============================================================
+         RESULT PANEL
+         ============================================================ -->
+    <div class="result-panel" id="resultPanel" aria-live="polite">
+      <div class="result-head">
+        <span>Video result</span>
+        <div class="result-tools">
+          <button class="btn btn-ghost btn-sm" id="downloadBtn" type="button" disabled>Download .mp4</button>
+          <button class="btn btn-ghost btn-sm" id="clearBtn" type="button" disabled>Clear</button>
+        </div>
+      </div>
+
+      <div class="result-body">
+
+        <!-- Empty state -->
+        <div class="result-state result-empty" id="resultEmpty">
+          <div class="stage-frame" aria-hidden="true">
+            <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+          <p>Your generated video will appear here once the secure backend is connected.</p>
+        </div>
+
+        <!-- Loading state -->
+        <div class="result-state result-loading" id="resultLoading" hidden>
+          <span class="spinner-lg" aria-hidden="true"></span>
+          <span id="loadingLabel">Submitting job…</span>
+          <span class="loading-status" id="loadingStatus">—</span>
+        </div>
+
+        <!-- Error state -->
+        <div class="result-state result-error" id="resultError" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 8v5M12 16.5v.01"/>
+          </svg>
+          <span id="resultErrorText"></span>
+        </div>
+
+        <!-- Done state -->
+        <div class="result-state result-done" id="resultDone" hidden>
+          <div class="result-meta">
+            <span id="resultDuration">—</span>
+            <span class="dot">·</span>
+            <span id="resultAspect">—</span>
+            <span class="dot">·</span>
+            <span id="resultModel">—</span>
+            <span class="badge-demo" id="resultDemoBadge" hidden>Demo output</span>
+          </div>
+          <div class="video-frame" id="videoFrame">
+            <video id="resultVideo" controls playsinline preload="metadata"></video>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         RECENT GENERATIONS
+         ============================================================ -->
+    <section class="recent" aria-labelledby="recentTitle">
+      <div class="recent-head">
+        <h2 id="recentTitle">
+          Recent generations
+          <span class="pill is-warn">Demo data</span>
+        </h2>
+      </div>
+
+      <div class="recent-grid" id="recentGrid"></div>
+    </section>
+
+  </div>
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="shell footer-inner">
+
+    <a class="brand" href="index.html" aria-label="Aavora.art — home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
+      </span>
+      <span>aavora<span class="brand-dot">.art</span></span>
+    </a>
+
+    <nav class="footer-links" aria-label="Footer">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <p class="footer-copy">© <span id="year">2025</span> Aavora.art</p>
+
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function truncate(str, n) {
+    str = (str || '').trim();
+    if (!str) return '';
+    return str.length > n ? str.slice(0, n).trim() + '…' : str;
+  }
+
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  var navToggle = $('#navToggle');
+  var mobileNav = $('#mobileNav');
+
+  function closeMobileNav() {
+    mobileNav.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+  navToggle.addEventListener('click', function () {
+    var open = mobileNav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMobileNav();
+  });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 880) closeMobileNav();
+  });
+  $$('a', mobileNav).forEach(function (link) {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  var header = $('#siteHeader');
+  function onScroll() { header.classList.toggle('is-scrolled', window.scrollY > 8); }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  var toastEl = $('#toast');
+  var toastTimer = null;
+
+  function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add('is-visible');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function () {
+      toastEl.classList.remove('is-visible');
+    }, 4600);
+  }
+
+  /* ============================================================
+     GOOGLE AUTH PLACEHOLDER
+     ============================================================ */
+  $$('[data-auth]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      showToast(
+        'Google Sign-In is not connected yet. Authentication will be enabled ' +
+        'once Firebase Authentication is configured.'
+      );
+    });
+  });
+
+  /* ============================================================
+     VIDEO STUDIO — CONFIG
+     ============================================================
+     ⚠  BACKEND CONTRACT (for the future secure backend):
+     ⚠    POST  /api/video/generate   → { jobId }
+     ⚠    GET   /api/video/status/:id → { status, videoUrl?, error? }
+     ⚠
+     ⚠  Add only model IDs that are enabled for your
+     ⚠  Google Cloud / Vertex AI project. Do NOT put API
+     ⚠  keys or service-account credentials here.
+     ============================================================ */
+  var VIDEO_CONFIG = {
+    models: [
+      /* Example shape (leave disabled / uncomment after backend setup):
+      {
+        id: 'veo-3.0-generate-preview',
+        label: 'Veo 3.0 (Preview)',
+        aspects: ['16:9', '9:16'],
+        durations: [4, 6, 8],
+        supportsNegativePrompt: true
+      }
+      */
+    ],
+
+    /* Credit costs — tune per plan; this is only an estimate. */
+    credits: {
+      base: 8,
+      perSecond: 2,
+      perImageMode: 3,
+      perNegativePrompt: 1
+    }
+  };
+
+  /* ============================================================
+     VIDEO STUDIO — STATE
+     ============================================================ */
+  var state = {
+    mode: 'text',
+    prompt: '',
+    negative: '',
+    modelId: '',
+    aspect: '',
+    duration: '',
+    imageFile: null
+  };
+
+  /* ============================================================
+     VIDEO STUDIO — ELEMENT REFS
+     ============================================================ */
+  var modeGrid    = $('#modeGrid');
+  var uploadField = $('#uploadField');
+  var uploadDrop  = $('#uploadDrop');
+  var fileInput   = $('#imageFile');
+  var uploadPrev  = $('#uploadPreview');
+  var uploadThumb = $('#uploadThumb');
+  var uploadName  = $('#uploadName');
+  var uploadSize  = $('#uploadSize');
+  var uploadRemove= $('#uploadRemove');
+
+  var promptInput = $('#videoPrompt');
+  var promptField = $('#promptField');
+  var promptCount = $('#promptCount');
+
+  var modelSelect = $('#modelSelect');
+  var modelHint   = $('#modelHint');
+  var modelWarn   = $('#modelWarn');
+  var modelPill   = $('#modelPill');
+
+  var aspectSelect   = $('#aspectSelect');
+  var durationSelect = $('#durationSelect');
+  var aspectHint     = $('#aspectHint');
+  var durationHint   = $('#durationHint');
+  var negativeInput  = $('#negativePrompt');
+  var negativeHint   = $('#negativeHint');
+
+  var generateBtn = $('#generateBtn');
+  var creditValue = $('#creditValue');
+
+  var sumMode     = $('#sumMode');
+  var sumModel    = $('#sumModel');
+  var sumAspect   = $('#sumAspect');
+  var sumDuration = $('#sumDuration');
+  var sumPrompt   = $('#sumPrompt');
+  var sumImage    = $('#sumImage');
+  var sumCredit   = $('#sumCredit');
+  var summaryReady = $('#summaryReady');
+
+  var resultEmpty     = $('#resultEmpty');
+  var resultLoading   = $('#resultLoading');
+  var resultError     = $('#resultError');
+  var resultErrorText = $('#resultErrorText');
+  var resultDone      = $('#resultDone');
+  var loadingLabel    = $('#loadingLabel');
+  var loadingStatus   = $('#loadingStatus');
+
+  var resultDuration  = $('#resultDuration');
+  var resultAspect    = $('#resultAspect');
+  var resultModel     = $('#resultModel');
+  var resultDemoBadge = $('#resultDemoBadge');
+  var videoFrame      = $('#videoFrame');
+  var resultVideo     = $('#resultVideo');
+
+  var downloadBtn = $('#downloadBtn');
+  var clearBtn    = $('#clearBtn');
+
+  var recentGrid  = $('#recentGrid');
+
+  /* ============================================================
+     VIDEO STUDIO — DERIVED VALUES
+     ============================================================ */
+  function getModel() {
+    return VIDEO_CONFIG.models.filter(function (m) { return m.id === state.modelId; })[0] || null;
+  }
+
+  function calculateCredits() {
+    var m = getModel();
+    if (!m) return null;
+
+    var cfg = VIDEO_CONFIG.credits;
+    var seconds = parseInt(state.duration, 10) || 0;
+    var total = cfg.base + (cfg.perSecond * seconds);
+    if (state.mode === 'image') total += cfg.perImageMode;
+    if (m.supportsNegativePrompt && state.negative.trim()) total += cfg.perNegativePrompt;
+    return total;
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — BUILD CONTROLS
+     ============================================================ */
+  function buildModels() {
+    var html = '';
+
+    if (!VIDEO_CONFIG.models.length) {
+      html = '<option value="">No video model configured yet.</option>';
+      modelSelect.disabled = true;
+      modelWarn.hidden = false;
+      modelPill.textContent = 'Not configured';
+      modelPill.classList.add('is-warn');
+    } else {
+      html = '<option value="">Select a model…</option>';
+      VIDEO_CONFIG.models.forEach(function (m) {
+        html += '<option value="' + m.id + '">' + m.label + '</option>';
+      });
+      modelSelect.disabled = false;
+      modelWarn.hidden = true;
+      modelPill.textContent = VIDEO_CONFIG.models.length + ' available';
+      modelPill.classList.remove('is-warn');
+    }
+
+    modelSelect.innerHTML = html;
+    modelSelect.value = state.modelId;
+  }
+
+  function rebuildSettingsForModel() {
+    var m = getModel();
+
+    if (!m) {
+      aspectSelect.innerHTML = '<option>Aspect not available</option>';
+      durationSelect.innerHTML = '<option>Duration not available</option>';
+      aspectSelect.disabled = true;
+      durationSelect.disabled = true;
+      negativeInput.disabled = true;
+      negativeInput.value = '';
+      state.aspect = '';
+      state.duration = '';
+      state.negative = '';
+
+      aspectHint.textContent = 'Select a model first.';
+      durationHint.textContent = 'Select a model first.';
+      negativeHint.textContent = 'Enabled when the selected model supports it.';
+      return;
+    }
+
+    // Aspect
+    aspectSelect.innerHTML = m.aspects.map(function (a) {
+      return '<option value="' + a + '">' + a + '</option>';
+    }).join('');
+    aspectSelect.disabled = false;
+    state.aspect = m.aspects[0] || '';
+    aspectSelect.value = state.aspect;
+    aspectHint.textContent = m.aspects.length + ' ratio' + (m.aspects.length > 1 ? 's' : '') + ' supported.';
+
+    // Duration
+    durationSelect.innerHTML = m.durations.map(function (d) {
+      return '<option value="' + d + '">' + d + ' seconds</option>';
+    }).join('');
+    durationSelect.disabled = false;
+    state.duration = String(m.durations[0] || '');
+    durationSelect.value = state.duration;
+    durationHint.textContent = m.durations.length + ' duration' + (m.durations.length > 1 ? 's' : '') + ' supported.';
+
+    // Negative prompt
+    if (m.supportsNegativePrompt) {
+      negativeInput.disabled = false;
+      negativeHint.textContent = 'This model supports negative prompts.';
+    } else {
+      negativeInput.disabled = true;
+      negativeInput.value = '';
+      state.negative = '';
+      negativeHint.textContent = 'The selected model does not support negative prompts.';
+    }
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — RENDER
+     ============================================================ */
+  function renderSummary() {
+    var m = getModel();
+
+    sumMode.textContent = state.mode === 'image' ? 'Image to Video' : 'Text to Video';
+
+    if (m) {
+      sumModel.textContent = m.label;
+      sumModel.classList.remove('is-empty');
+    } else {
+      sumModel.textContent = 'Not selected';
+      sumModel.classList.add('is-empty');
+    }
+
+    if (state.aspect) {
+      sumAspect.textContent = state.aspect;
+      sumAspect.classList.remove('is-empty');
+    } else {
+      sumAspect.textContent = '—';
+      sumAspect.classList.add('is-empty');
+    }
+
+    if (state.duration) {
+      sumDuration.textContent = state.duration + ' seconds';
+      sumDuration.classList.remove('is-empty');
+    } else {
+      sumDuration.textContent = '—';
+      sumDuration.classList.add('is-empty');
+    }
+
+    if (state.prompt.trim()) {
+      sumPrompt.textContent = truncate(state.prompt, 60);
+      sumPrompt.classList.remove('is-empty');
+    } else {
+      sumPrompt.textContent = '—';
+      sumPrompt.classList.add('is-empty');
+    }
+
+    if (state.mode === 'image') {
+      if (state.imageFile) {
+        sumImage.textContent = state.imageFile.name;
+        sumImage.classList.remove('is-empty');
+      } else {
+        sumImage.textContent = 'No image uploaded';
+        sumImage.classList.add('is-empty');
+      }
+    } else {
+      sumImage.textContent = '—';
+      sumImage.classList.add('is-empty');
+    }
+
+    var credits = calculateCredits();
+    creditValue.textContent = credits === null ? '—' : credits;
+    sumCredit.textContent = credits === null ? '—' : credits;
+
+    var ready =
+      !!m &&
+      state.prompt.trim().length >= 10 &&
+      !!state.aspect &&
+      !!state.duration &&
+      (state.mode !== 'image' || !!state.imageFile);
+
+    summaryReady.textContent = ready ? 'Ready' : 'Not ready';
+    summaryReady.classList.toggle('is-ready', ready);
+
+    generateBtn.disabled = !ready || isGenerating;
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — IMAGE UPLOAD
+     ============================================================ */
+  function formatBytes(bytes) {
+    if (!bytes) return '0 KB';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+  }
+
+  function setImageFile(file) {
+    if (!file) {
+      state.imageFile = null;
+      uploadPrev.hidden = true;
+      renderSummary();
+      return;
+    }
+
+    var okTypes = ['image/png', 'image/jpeg', 'image/webp'];
+    if (okTypes.indexOf(file.type) === -1) {
+      showToast('Please choose a PNG, JPG or WebP image.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Image is larger than 10 MB. Please choose a smaller file.');
+      return;
+    }
+
+    state.imageFile = file;
+
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      uploadThumb.style.backgroundImage = 'url("' + e.target.result + '")';
+    };
+    reader.readAsDataURL(file);
+
+    uploadName.textContent = file.name;
+    uploadSize.textContent = formatBytes(file.size);
+    uploadPrev.hidden = false;
+
+    renderSummary();
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — MODE HANDLING
+     ============================================================ */
+  function setMode(mode) {
+    state.mode = mode;
+
+    $$('.mode-card', modeGrid).forEach(function (card) {
+      var on = card.getAttribute('data-mode') === mode;
+      card.classList.toggle('is-selected', on);
+      card.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+
+    uploadField.hidden = mode !== 'image';
+
+    if (mode !== 'image') {
+      state.imageFile = null;
+      uploadPrev.hidden = true;
+      uploadThumb.style.backgroundImage = '';
+    }
+
+    renderSummary();
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — RESULT STATE
+     ============================================================ */
+  function showResultState(name) {
+    resultEmpty.hidden   = name !== 'empty';
+    resultLoading.hidden = name !== 'loading';
+    resultError.hidden   = name !== 'error';
+    resultDone.hidden    = name !== 'done';
+
+    var hasVideo = name === 'done' && resultVideo.src;
+    downloadBtn.disabled = !hasVideo;
+    clearBtn.disabled = name === 'empty' || name === 'loading';
+  }
+
+  function showResultError(message) {
+    resultErrorText.textContent = message;
+    showResultState('error');
+  }
+
+  function clearResult() {
+    resultVideo.pause();
+    resultVideo.removeAttribute('src');
+    resultVideo.load();
+    resultDemoBadge.hidden = true;
+    showResultState('empty');
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — GENERATE FLOW (no backend)
+     ============================================================ */
+  var isGenerating = false;
+
+  function setGenerating(on, label, status) {
+    isGenerating = on;
+    generateBtn.classList.toggle('is-loading', on);
+    generateBtn.disabled = on;
+
+    var btnLabel = generateBtn.querySelector('.btn-label');
+    if (btnLabel) btnLabel.textContent = on ? 'Generating…' : 'Generate video';
+
+    if (on) {
+      loadingLabel.textContent = label || 'Submitting job…';
+      loadingStatus.textContent = status || '—';
+    }
+  }
+
+  function handleGenerate() {
+    if (isGenerating) return;
+
+    var m = getModel();
+
+    promptField.classList.remove('has-error');
+
+    if (!m) {
+      showResultError(
+        'No video model configured yet. Add an enabled Google Veo model ID ' +
+        'to the VIDEO_CONFIG object at the bottom of this file.'
+      );
+      return;
+    }
+
+    if (state.prompt.trim().length < 10) {
+      promptField.classList.add('has-error');
+      showResultError(
+        'Please describe your video first — at least 10 characters so the ' +
+        'model has something to work with.'
+      );
+      promptInput.focus();
+      promptInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    if (state.mode === 'image' && !state.imageFile) {
+      showResultError('Image to Video requires a source image. Please upload one first.');
+      return;
+    }
+
+    setGenerating(true, 'Submitting job…', 'Contacting secure backend…');
+    showResultState('loading');
+
+    /* ----------------------------------------------------------
+       BACKEND HOOK (replace this timeout when the backend exists)
+
+         fetch('/api/video/generate', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ ...state, imageMeta: ... })
+         })
+         .then(r => r.json())
+         .then(data => pollJob(data.jobId))
+         .catch(err => { setGenerating(false); showResultError(err.message); });
+
+         function pollJob(id) {
+           fetch('/api/video/status/' + id)
+             .then(r => r.json())
+             .then(data => {
+               if (data.status === 'processing') { ...; setTimeout(() => pollJob(id), 2000); }
+               else if (data.status === 'done') {
+                 setGenerating(false);
+                 resultVideo.src = data.videoUrl;
+                 ... set meta ...
+                 showResultState('done');
+               } else {
+                 setGenerating(false);
+                 showResultError(data.error || 'Generation failed.');
+               }
+             });
+         }
+       ---------------------------------------------------------- */
+
+    window.setTimeout(function () {
+      setGenerating(false);
+      showResultError(
+        'Video generation is not connected yet. Configure the secure ' +
+        'Google Vertex AI backend first. No video has been generated.'
+      );
+      showToast('Video generation is not connected yet.');
+    }, 1600);
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — DOWNLOAD
+     ============================================================ */
+  function downloadVideo() {
+    if (!resultVideo.src) return;
+    var a = document.createElement('a');
+    a.href = resultVideo.src;
+    a.download = 'aavora-video.mp4';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Download started.');
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — RECENT GENERATIONS (demo data, clearly labelled)
+     ============================================================ */
+  var RECENT_DEMO = [
+    { title: 'Neon alley, slow dolly',  duration: '6s', aspect: '16:9', status: 'Demo' },
+    { title: 'Coastal sunset, drone',   duration: '8s', aspect: '16:9', status: 'Demo' },
+    { title: 'Portrait of a traveller', duration: '4s', aspect: '9:16', status: 'Demo' }
+  ];
+
+  function renderRecent() {
+    recentGrid.innerHTML = RECENT_DEMO.map(function (r) {
+      return (
+        '<article class="recent-card">' +
+          '<div class="recent-thumb" aria-hidden="true">' +
+            '<span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>' +
+          '</div>' +
+          '<div class="recent-body">' +
+            '<strong>' + r.title + '</strong>' +
+            '<small>' + r.duration + ' · ' + r.aspect + '</small>' +
+            '<div><span class="status-chip">' + r.status + '</span></div>' +
+          '</div>' +
+        '</article>'
+      );
+    }).join('');
+  }
+
+  /* ============================================================
+     VIDEO STUDIO — EVENT WIRING
+     ============================================================ */
+  modeGrid.addEventListener('click', function (e) {
+    var card = e.target.closest ? e.target.closest('.mode-card') : null;
+    if (!card) return;
+    setMode(card.getAttribute('data-mode'));
+  });
+
+  fileInput.addEventListener('change', function () {
+    setImageFile(fileInput.files && fileInput.files[0]);
+  });
+
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    uploadDrop.addEventListener(ev, function (e) {
+      e.preventDefault();
+      uploadDrop.classList.add('is-dragging');
+    });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    uploadDrop.addEventListener(ev, function (e) {
+      e.preventDefault();
+      uploadDrop.classList.remove('is-dragging');
+    });
+  });
+  uploadDrop.addEventListener('drop', function (e) {
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setImageFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  uploadRemove.addEventListener('click', function () {
+    fileInput.value = '';
+    setImageFile(null);
+  });
+
+  promptInput.addEventListener('input', function () {
+    state.prompt = promptInput.value;
+    promptCount.textContent = state.prompt.length;
+    promptField.classList.remove('has-error');
+    renderSummary();
+  });
+
+  modelSelect.addEventListener('change', function () {
+    state.modelId = modelSelect.value;
+    rebuildSettingsForModel();
+    renderSummary();
+  });
+
+  aspectSelect.addEventListener('change', function () {
+    state.aspect = aspectSelect.value;
+    renderSummary();
+  });
+
+  durationSelect.addEventListener('change', function () {
+    state.duration = durationSelect.value;
+    renderSummary();
+  });
+
+  negativeInput.addEventListener('input', function () {
+    state.negative = negativeInput.value;
+    renderSummary();
+  });
+
+  $('#videoForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    handleGenerate();
+  });
+
+  downloadBtn.addEventListener('click', downloadVideo);
+  clearBtn.addEventListener('click', function () {
+    clearResult();
+    showToast('Result cleared.');
+  });
+
+  /* ============================================================
+     VIDEO STUDIO — BOOT
+     ============================================================ */
+  buildModels();
+  rebuildSettingsForModel();
+  renderRecent();
+  renderSummary();
+  showResultState('empty');
+
+  /* ============================================================
+     FOOTER YEAR
+     ============================================================ */
+  $('#year').textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>
