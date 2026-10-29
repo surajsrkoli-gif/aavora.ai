@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Script Studio — Aavora.art</title>
+<meta name="description" content="Aavora.art Script Studio — turn your story ideas into structured scripts. Choose a type, language, length and emotional tone." />
+<meta name="theme-color" content="#FBFCFA" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+
+<style>
+  /* ============================================================
+     1. DESIGN TOKENS (shared with homepage)
+     ============================================================ */
+  :root{
+    --bg:#FBFCFA;
+    --tint:#F2F5EF;
+    --surface:#FFFFFF;
+
+    --ink:#0B1210;
+    --ink-soft:#35413B;
+    --muted:#68746D;
+
+    --line:#E5E9E3;
+    --line-strong:#D0D7CE;
+
+    --emerald:#0E9F6E;
+    --emerald-deep:#0A7A54;
+    --emerald-tint:#E8F5EE;
+
+    --danger:#B42318;
+    --danger-tint:#FDECEA;
+
+    --radius-xl:24px;
+    --radius-lg:18px;
+    --radius:13px;
+
+    --shadow-sm:0 1px 2px rgba(11,18,16,.04), 0 8px 22px -20px rgba(11,18,16,.38);
+    --shadow-md:0 26px 50px -34px rgba(11,18,16,.55);
+
+    --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --font-serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+    --font-mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace;
+
+    --header-h:70px;
+    --shell:min(100% - 44px, 1120px);
+  }
+
+  /* ============================================================
+     2. RESET / BASE
+     ============================================================ */
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  h1,h2,h3{margin:0;font-weight:600;line-height:1.12;letter-spacing:-.028em}
+  p{margin:0}
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  img,svg{display:block;max-width:100%}
+  ul,ol{margin:0;padding:0;list-style:none}
+  code{font-family:var(--font-mono)}
+
+  ::selection{background:rgba(14,159,110,.22);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--emerald);outline-offset:3px;border-radius:8px}
+
+  .shell{width:var(--shell);margin-inline:auto}
+  .sr-only{
+    position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
+  }
+
+  /* ============================================================
+     3. BUTTONS
+     ============================================================ */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    font-size:.9rem;font-weight:600;line-height:1;
+    padding:13px 20px;border-radius:12px;border:1px solid transparent;
+    white-space:nowrap;cursor:pointer;
+    transition:transform .18s ease, background .2s ease, border-color .2s ease,
+               box-shadow .25s ease, color .2s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+
+  .btn-primary{
+    background:var(--emerald-deep);color:#fff;
+    box-shadow:0 12px 24px -16px rgba(10,122,84,.95);
+  }
+  .btn-primary:hover{
+    background:#086446;transform:translateY(-2px);
+    box-shadow:0 18px 30px -18px rgba(10,122,84,1);
+  }
+  .btn-ghost{
+    background:var(--surface);border-color:var(--line);color:var(--ink);
+    box-shadow:var(--shadow-sm);
+  }
+  .btn-ghost:hover{transform:translateY(-2px);border-color:var(--line-strong)}
+  .btn-google{
+    background:var(--surface);border-color:var(--line);color:var(--ink);
+    font-weight:500;font-size:.86rem;padding:10px 14px;box-shadow:var(--shadow-sm);
+  }
+  .btn-google:hover{transform:translateY(-1px);border-color:var(--line-strong)}
+  .btn-google svg{width:15px;height:15px;flex:none}
+  .btn-sm{padding:8px 13px;font-size:.8rem;border-radius:9px}
+  .btn-block{width:100%}
+  .btn:disabled{opacity:.55;cursor:not-allowed;transform:none !important;box-shadow:none}
+
+  .btn svg.arrow{
+    width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;flex:none;
+    transition:transform .2s ease;
+  }
+  .btn:hover svg.arrow{transform:translateX(3px)}
+
+  .btn.is-loading{pointer-events:none;opacity:.92}
+  .btn.is-loading .arrow{display:none}
+  .btn.is-loading::after{
+    content:"";width:14px;height:14px;
+    border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ============================================================
+     4. HEADER
+     ============================================================ */
+  .site-header{
+    position:sticky;top:0;z-index:100;
+    background:rgba(251,252,250,.86);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s ease, box-shadow .3s ease;
+  }
+  .site-header.is-scrolled{
+    border-bottom-color:var(--line);
+    box-shadow:0 18px 30px -30px rgba(11,18,16,.55);
+  }
+
+  .nav-shell{display:flex;align-items:center;justify-content:space-between;gap:22px;height:var(--header-h)}
+
+  .brand{display:inline-flex;align-items:center;gap:10px;font-size:1.05rem;font-weight:600;letter-spacing:-.03em}
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(145deg,#13BC83,#0A7A54);
+    box-shadow:0 8px 16px -10px rgba(14,159,110,1), inset 0 0 0 1px rgba(255,255,255,.22);
+  }
+  .brand-mark svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .brand-dot{color:var(--emerald)}
+
+  .nav-links{display:flex;align-items:center;gap:2px}
+  .nav-links a{
+    font-size:.9rem;font-weight:500;color:var(--ink-soft);
+    padding:9px 15px;border-radius:999px;
+    transition:color .2s ease, background .2s ease;
+  }
+  .nav-links a:hover{color:var(--ink);background:rgba(11,18,16,.05)}
+  .nav-links a.is-active{color:var(--emerald-deep);background:var(--emerald-tint)}
+
+  .nav-actions{display:flex;align-items:center;gap:10px}
+
+  .nav-toggle{
+    display:none;width:40px;height:40px;border-radius:11px;
+    border:1px solid var(--line);background:var(--surface);
+    align-items:center;justify-content:center;
+  }
+  .nav-toggle span{position:relative;display:block;width:16px;height:1.6px;border-radius:2px;background:var(--ink);transition:background .2s ease}
+  .nav-toggle span::before,.nav-toggle span::after{
+    content:"";position:absolute;left:0;width:16px;height:1.6px;border-radius:2px;background:var(--ink);
+    transition:transform .25s ease;
+  }
+  .nav-toggle span::before{top:-5px}
+  .nav-toggle span::after{top:5px}
+  .nav-toggle[aria-expanded="true"] span{background:transparent}
+  .nav-toggle[aria-expanded="true"] span::before{transform:translateY(5px) rotate(45deg)}
+  .nav-toggle[aria-expanded="true"] span::after{transform:translateY(-5px) rotate(-45deg)}
+
+  .mobile-nav{
+    display:none;flex-direction:column;gap:2px;
+    padding:6px 22px 20px;
+    background:rgba(251,252,250,.99);
+    border-top:1px solid var(--line);
+  }
+  .mobile-nav.is-open{display:flex}
+  .mobile-nav a{
+    padding:13px 4px;font-size:.95rem;font-weight:500;color:var(--ink-soft);
+    border-bottom:1px solid rgba(11,18,16,.06);
+  }
+  .mobile-nav a.is-active{color:var(--emerald-deep)}
+  .mobile-nav .btn{margin-top:14px;width:100%}
+
+  /* ============================================================
+     5. PAGE HEAD
+     ============================================================ */
+  .page-wrap{padding:34px 0 84px}
+
+  .back-link{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:.86rem;font-weight:500;color:var(--muted);
+    margin-bottom:24px;transition:color .2s ease;
+  }
+  .back-link:hover{color:var(--ink)}
+  .back-link svg{
+    width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;
+    stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  .page-head{max-width:680px;margin-bottom:32px}
+  .page-head h1{font-size:clamp(1.85rem,3.6vw,2.55rem);margin:16px 0 12px}
+  .page-head p{color:var(--muted);font-size:1rem}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--emerald-deep);background:var(--emerald-tint);
+    border:1px solid rgba(14,159,110,.18);
+    padding:6px 12px;border-radius:999px;
+  }
+  .eyebrow-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--emerald);
+    box-shadow:0 0 0 3px rgba(14,159,110,.16);
+  }
+
+  /* ============================================================
+     6. LAYOUT: FORM + STICKY PREVIEW
+     ============================================================ */
+  .script-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,330px);
+    gap:22px;
+    align-items:start;
+  }
+
+  .script-side{position:sticky;top:calc(var(--header-h) + 18px)}
+
+  /* ============================================================
+     7. FORM SECTIONS
+     ============================================================ */
+  .script-form{display:flex;flex-direction:column;gap:16px}
+
+  .form-section{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:22px;
+    box-shadow:var(--shadow-sm);
+  }
+
+  .form-section-head{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    margin-bottom:16px;
+  }
+  .form-section-title{
+    display:flex;align-items:center;gap:10px;margin:0;
+    font-size:.94rem;font-weight:600;letter-spacing:-.01em;
+    color:var(--ink);
+  }
+  .step-badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:24px;height:24px;border-radius:7px;flex:none;
+    background:var(--emerald-tint);color:var(--emerald-deep);
+    font-size:.68rem;font-weight:700;letter-spacing:.02em;
+  }
+  .form-section-hint{font-size:.82rem;color:var(--muted);margin-top:8px}
+
+  /* ============================================================
+     8. STEP 1 — SCRIPT TYPE CARDS
+     ============================================================ */
+  .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+  .type-card{
+    position:relative;
+    display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+    text-align:left;
+    padding:16px 15px;
+    background:#FBFCFA;
+    border:1px solid var(--line);
+    border-radius:14px;
+    cursor:pointer;
+    transition:transform .18s ease, border-color .2s ease,
+               background .2s ease, box-shadow .25s ease;
+  }
+  .type-card:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+  .type-card.is-selected{
+    background:var(--emerald-tint);
+    border-color:rgba(14,159,110,.5);
+    box-shadow:0 0 0 3px rgba(14,159,110,.1);
+  }
+
+  .type-icon{
+    width:36px;height:36px;border-radius:10px;
+    display:grid;place-items:center;
+    background:#fff;border:1px solid var(--line);
+    color:var(--emerald-deep);
+    transition:border-color .2s ease;
+  }
+  .type-card.is-selected .type-icon{border-color:rgba(14,159,110,.35)}
+  .type-icon svg{width:17px;height:17px}
+
+  .type-info{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .type-label{font-size:.93rem;font-weight:600;line-height:1.25}
+  .type-desc{font-size:.78rem;color:var(--muted);line-height:1.45}
+
+  .type-check{
+    position:absolute;top:10px;right:10px;
+    width:20px;height:20px;border-radius:50%;
+    display:grid;place-items:center;
+    background:var(--emerald);color:#fff;
+    opacity:0;transform:scale(.6);
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .type-check svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+  .type-card.is-selected .type-check{opacity:1;transform:scale(1)}
+
+  /* ============================================================
+     9. FIELDS
+     ============================================================ */
+  .field{margin-bottom:16px}
+  .field:last-of-type{margin-bottom:0}
+
+  .field label{
+    display:block;margin-bottom:8px;
+    font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .field select,
+  .field textarea{
+    width:100%;font:inherit;font-size:.94rem;color:var(--ink);
+    background:#FBFCFA;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;line-height:1.55;
+    transition:border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .field textarea{min-height:140px;resize:vertical}
+  .field textarea::placeholder{color:#9AA6A0}
+  .field select{
+    appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2368746D' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+  }
+  .field select:focus,
+  .field textarea:focus{
+    outline:none;border-color:var(--emerald);
+    box-shadow:0 0 0 4px rgba(14,159,110,.12);background:#fff;
+  }
+  .field.has-error textarea{
+    border-color:var(--danger);
+    box-shadow:0 0 0 4px rgba(180,35,24,.1);
+  }
+
+  .field-hint{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-size:.78rem;color:var(--muted);margin-top:8px;
+  }
+  .field-hint .counter{font-variant-numeric:tabular-nums}
+
+  .form-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+  /* ============================================================
+     10. STEP 5 — EMOTION TOGGLE + TAGS
+     ============================================================ */
+  .switch{
+    position:relative;display:inline-block;
+    width:44px;height:24px;flex:none;
+  }
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .switch .slider{
+    position:absolute;inset:0;
+    background:var(--line-strong);
+    border-radius:999px;cursor:pointer;
+    transition:background .22s ease;
+  }
+  .switch .slider::before{
+    content:"";position:absolute;
+    width:18px;height:18px;left:3px;top:3px;
+    background:#fff;border-radius:50%;
+    box-shadow:0 1px 3px rgba(11,18,16,.25);
+    transition:transform .22s ease;
+  }
+  .switch input:checked + .slider{background:var(--emerald)}
+  .switch input:checked + .slider::before{transform:translateX(20px)}
+  .switch input:focus-visible + .slider{outline:2px solid var(--emerald);outline-offset:2px}
+
+  .tag-grid{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin-top:4px;
+  }
+  .chip{
+    font-size:.82rem;font-weight:500;color:var(--ink-soft);
+    background:#FBFCFA;border:1px solid var(--line);
+    padding:8px 14px;border-radius:999px;
+    transition:background .2s ease, border-color .2s ease,
+               color .2s ease, transform .15s ease;
+  }
+  .chip:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+  .chip.is-selected{
+    background:var(--emerald-tint);
+    border-color:rgba(14,159,110,.42);
+    color:var(--emerald-deep);
+  }
+
+  .mood-preview{
+    margin-top:14px;
+    padding:12px 14px;
+    background:#F6F9F5;
+    border:1px dashed var(--line-strong);
+    border-radius:11px;
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .mood-preview-label{
+    font-size:.68rem;font-weight:600;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .mood-preview code{
+    font-size:.82rem;color:var(--ink-soft);
+    word-break:break-word;
+  }
+
+  /* ============================================================
+     11. GENERATE BAR
+     ============================================================ */
+  .generate-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    padding:18px 20px;box-shadow:var(--shadow-sm);
+  }
+  .credit-estimate{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .credit-label{
+    font-size:.7rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .credit-value{
+    display:flex;align-items:baseline;gap:5px;
+    font-size:1.3rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);
+  }
+  .credit-value span{font-size:.8rem;font-weight:500;color:var(--muted)}
+  .credit-note{font-size:.74rem;color:var(--muted)}
+  .generate-bar .btn{flex:none}
+
+  /* ============================================================
+     12. STICKY SETUP PREVIEW
+     ============================================================ */
+  .preview-panel{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);overflow:hidden;
+  }
+  .preview-head{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .pill{
+    font-size:.7rem;font-weight:500;letter-spacing:0;text-transform:none;
+    color:var(--muted);background:#F4F6F3;border:1px solid var(--line);
+    padding:3px 9px;border-radius:999px;
+    transition:color .2s ease, background .2s ease, border-color .2s ease;
+  }
+  .pill.is-ready{
+    color:var(--emerald-deep);background:var(--emerald-tint);
+    border-color:rgba(14,159,110,.28);
+  }
+
+  .setup-list{padding:6px 18px 12px;margin:0}
+  .setup-list > div{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+    font-size:.84rem;
+  }
+  .setup-list > div:last-child{border-bottom:0}
+  .setup-list dt{color:var(--muted);flex:none;font-weight:500}
+  .setup-list dd{
+    margin:0;text-align:right;font-weight:600;color:var(--ink);
+    word-break:break-word;max-width:60%;
+  }
+  .setup-list dd.is-empty{color:#A2AEA7;font-weight:500}
+
+  .preview-credit{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin:0 18px 18px;padding:12px 14px;
+    background:var(--emerald-tint);
+    border:1px solid rgba(14,159,110,.2);
+    border-radius:11px;
+    font-size:.82rem;color:var(--emerald-deep);
+  }
+  .preview-credit strong{
+    font-size:1.05rem;font-weight:700;color:var(--emerald-deep);
+    font-variant-numeric:tabular-nums;
+  }
+  .preview-credit .unit{
+    font-size:.74rem;font-weight:500;color:var(--emerald-deep);
+    opacity:.75;margin-left:3px;
+  }
+
+  /* ============================================================
+     13. RESULT PANEL
+     ============================================================ */
+  .result-panel{
+    margin-top:22px;
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);
+    overflow:hidden;
+  }
+  .result-head{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);
+  }
+  .result-tools{display:flex;gap:8px;flex-wrap:wrap}
+  .result-body{padding:20px}
+
+  .result-state{animation:resultIn .28s ease both}
+  @keyframes resultIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .result-empty{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:12px;padding:34px 16px;text-align:center;
+  }
+  .result-empty p{color:var(--muted);font-size:.92rem;max-width:46ch}
+  .link-btn{
+    font-size:.84rem;font-weight:600;color:var(--emerald-deep);
+    text-decoration:underline;text-underline-offset:3px;
+    text-decoration-color:rgba(14,159,110,.4);
+  }
+  .link-btn:hover{text-decoration-color:var(--emerald-deep)}
+
+  .result-loading{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:14px;padding:34px 16px;
+    color:var(--muted);font-size:.9rem;text-align:center;
+  }
+  .spinner-lg{
+    width:30px;height:30px;border-radius:50%;
+    border:3px solid var(--emerald-tint);border-top-color:var(--emerald);
+    animation:spin .8s linear infinite;
+  }
+
+  .result-error{
+    display:flex;align-items:flex-start;gap:12px;
+    background:var(--danger-tint);border:1px solid rgba(180,35,24,.22);
+    border-radius:12px;padding:16px 18px;
+    color:var(--danger);font-size:.9rem;line-height:1.55;
+  }
+  .result-error svg{
+    width:18px;height:18px;flex:none;stroke:var(--danger);fill:none;
+    stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:2px;
+  }
+
+  .result-done{display:flex;flex-direction:column;gap:14px}
+  .result-meta{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    font-size:.78rem;color:var(--muted);
+  }
+  .result-meta .dot{opacity:.5}
+  .badge-demo{
+    font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--emerald-deep);background:var(--emerald-tint);
+    border:1px solid rgba(14,159,110,.25);
+    padding:3px 9px;border-radius:999px;
+  }
+  .result-text{
+    margin:0;padding:18px;
+    background:#FBFCFA;border:1px solid var(--line);border-radius:12px;
+    font-family:var(--font-mono);
+    font-size:.84rem;line-height:1.68;color:var(--ink);
+    white-space:pre-wrap;word-break:break-word;
+    max-height:480px;overflow:auto;
+  }
+
+  /* ============================================================
+     14. FOOTER
+     ============================================================ */
+  .site-footer{background:var(--tint);border-top:1px solid var(--line);padding:34px 0}
+  .footer-inner{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;
+  }
+  .footer-links{display:flex;flex-wrap:wrap;gap:24px;font-size:.87rem;color:var(--muted)}
+  .footer-links a{transition:color .2s ease}
+  .footer-links a:hover{color:var(--ink)}
+  .footer-copy{font-size:.82rem;color:var(--muted)}
+
+  /* ============================================================
+     15. TOAST
+     ============================================================ */
+  .toast{
+    position:fixed;left:50%;bottom:28px;z-index:200;
+    transform:translate(-50%,18px);
+    background:var(--ink);color:#F7FAF7;
+    font-size:.86rem;line-height:1.45;text-align:center;
+    padding:13px 20px;border-radius:12px;
+    max-width:calc(100% - 40px);
+    box-shadow:0 26px 50px -24px rgba(0,0,0,.65);
+    opacity:0;pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+  /* ============================================================
+     16. RESPONSIVE
+     ============================================================ */
+  @media (max-width:1080px){
+    .script-layout{grid-template-columns:minmax(0,1fr) minmax(0,300px)}
+  }
+
+  @media (max-width:1000px){
+    .script-layout{grid-template-columns:1fr}
+    .script-side{position:static}
+  }
+
+  @media (max-width:880px){
+    .nav-links{display:none}
+    .nav-toggle{display:inline-flex}
+    .nav-actions .btn-google{display:none}
+  }
+
+  @media (max-width:760px){
+    .type-grid{grid-template-columns:1fr}
+    .type-card{flex-direction:row;align-items:center;gap:14px;padding:14px}
+    .type-desc{display:none}
+    .type-check{top:50%;transform:translateY(-50%) scale(.6)}
+    .type-card.is-selected .type-check{transform:translateY(-50%) scale(1)}
+    .form-row{grid-template-columns:1fr 1fr}
+  }
+
+  @media (max-width:700px){
+    :root{--shell:calc(100% - 40px)}
+    .page-wrap{padding:24px 0 64px}
+    .footer-inner{flex-direction:column;align-items:flex-start;gap:16px}
+    .generate-bar{flex-direction:column;align-items:stretch}
+    .generate-bar .btn{width:100%}
+    .result-head{flex-direction:column;align-items:flex-start}
+    .result-tools{width:100%}
+    .result-tools .btn{flex:1}
+  }
+
+  @media (max-width:520px){
+    .form-row{grid-template-columns:1fr}
+  }
+
+  @media (max-width:420px){
+    .brand{font-size:1rem}
+    .setup-list dd{max-width:65%}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="site-header" id="siteHeader">
+  <div class="shell nav-shell">
+
+    <a class="brand" href="index.html" aria-label="Aavora.art — home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
+      </span>
+      <span>aavora<span class="brand-dot">.art</span></span>
+    </a>
+
+    <nav class="nav-links" aria-label="Studios">
+      <a href="script-studio.html" class="is-active" aria-current="page">Script Studio</a>
+      <a href="video-studio.html">Video Studio</a>
+      <a href="image-studio.html">Image Studio</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn btn-google" type="button" data-auth>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Sign in with Google</span>
+      </button>
+
+      <button class="nav-toggle" id="navToggle" type="button"
+              aria-label="Toggle navigation menu"
+              aria-expanded="false"
+              aria-controls="mobileNav">
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="script-studio.html" class="is-active" aria-current="page">Script Studio</a>
+    <a href="video-studio.html">Video Studio</a>
+    <a href="image-studio.html">Image Studio</a>
+    <button class="btn btn-google" type="button" data-auth>
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      <span>Sign in with Google</span>
+    </button>
+  </div>
+</header>
+
+<main class="page-wrap">
+  <div class="shell">
+
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      Back to home
+    </a>
+
+    <div class="page-head">
+      <span class="eyebrow">
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+        Script Studio
+      </span>
+      <h1>Turn your story ideas into structured scripts.</h1>
+      <p>Choose a type, language and length, then describe the story you want to tell. Your setup stays visible on the right as you go.</p>
+    </div>
+
+    <!-- ============================================================
+         FORM + STICKY PREVIEW
+         ============================================================ -->
+    <div class="script-layout">
+
+      <!-- ================= FORM ================= -->
+      <form class="script-form" id="scriptForm" novalidate>
+
+        <!-- STEP 1 — SCRIPT TYPE -->
+        <section class="form-section" aria-labelledby="typeTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="typeTitle">
+              <span class="step-badge" aria-hidden="true">1</span>
+              Script type
+            </h2>
+            <span class="pill">Pick one</span>
+          </div>
+          <div class="type-grid" id="typeGrid" role="radiogroup" aria-label="Script type"></div>
+        </section>
+
+        <!-- STEPS 2–4 — LANGUAGE, LENGTH, CHARACTERS -->
+        <section class="form-section" aria-labelledby="basicsTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="basicsTitle">
+              <span class="step-badge" aria-hidden="true">2</span>
+              Basics
+            </h2>
+          </div>
+
+          <div class="form-row">
+
+            <div class="field">
+              <label for="scriptLanguage">Language</label>
+              <select id="scriptLanguage">
+                <option value="hindi">Hindi (Devanagari)</option>
+                <option value="hinglish">Hinglish</option>
+                <option value="english" selected>English</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="scriptLength">Story length</label>
+              <select id="scriptLength">
+                <option value="5" selected>5 minutes</option>
+                <option value="10">10 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="20">20 minutes</option>
+              </select>
+              <p class="field-hint" id="lengthHint">Target: 600–750 words</p>
+            </div>
+
+            <div class="field">
+              <label for="scriptCharacters">Characters</label>
+              <select id="scriptCharacters"></select>
+              <p class="field-hint" id="characterHint">3 characters</p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- STEP 5 — EMOTION TAGS -->
+        <section class="form-section" aria-labelledby="emotionTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="emotionTitle">
+              <span class="step-badge" aria-hidden="true">3</span>
+              Emotion tags
+            </h2>
+            <label class="switch" title="Enable emotion tags">
+              <input type="checkbox" id="emotionToggle" aria-label="Enable emotion tags">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div id="emotionBody" hidden>
+            <div class="tag-grid" id="emotionTags" role="group" aria-label="Select emotion tags"></div>
+            <div class="mood-preview" aria-live="polite">
+              <span class="mood-preview-label">Output format preview</span>
+              <code id="moodPreviewCode">[Mood: —]</code>
+            </div>
+          </div>
+
+          <p class="form-section-hint" id="emotionHint">
+            Turn on to tag the emotional beats the script should hit.
+          </p>
+        </section>
+
+        <!-- STEP 6 — STORY IDEA -->
+        <section class="form-section" aria-labelledby="ideaTitle">
+          <div class="form-section-head">
+            <h2 class="form-section-title" id="ideaTitle">
+              <span class="step-badge" aria-hidden="true">4</span>
+              Describe your story idea
+            </h2>
+            <span class="pill">Required</span>
+          </div>
+
+          <div class="field" id="ideaField">
+            <label class="sr-only" for="storyIdea">Describe your story idea</label>
+            <textarea
+              id="storyIdea"
+              maxlength="2000"
+              placeholder="Write your story idea, characters, setting, conflict, or the message you want to convey…"
+              required
+              aria-describedby="ideaHint"></textarea>
+            <p class="field-hint" id="ideaHint">
+              <span>A clear premise helps more than a long one.</span>
+              <span class="counter"><span id="ideaCount">0</span> / 2000</span>
+            </p>
+          </div>
+        </section>
+
+        <!-- GENERATE BAR -->
+        <div class="generate-bar">
+          <div class="credit-estimate">
+            <span class="credit-label">Estimated credits</span>
+            <span class="credit-value"><span id="creditValue">17</span><span>credits</span></span>
+            <span class="credit-note">Estimate only — the credit backend is not connected.</span>
+          </div>
+          <button class="btn btn-primary" id="generateBtn" type="submit">
+            <span class="btn-label">Generate script</span>
+            <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+
+      </form>
+
+      <!-- ================= STICKY SETUP PREVIEW ================= -->
+      <aside class="script-side" aria-labelledby="previewTitle">
+        <div class="preview-panel">
+          <div class="preview-head">
+            <span id="previewTitle">Setup preview</span>
+            <span class="pill" id="previewReady">Needs an idea</span>
+          </div>
+
+          <dl class="setup-list" aria-live="polite">
+            <div><dt>Type</dt><dd id="previewType">Moral Story</dd></div>
+            <div><dt>Language</dt><dd id="previewLanguage">English</dd></div>
+            <div><dt>Length</dt><dd id="previewLength">5 minutes</dd></div>
+            <div><dt>Word target</dt><dd id="previewWords">600–750</dd></div>
+            <div><dt>Characters</dt><dd id="previewCharacters">3 characters</dd></div>
+            <div><dt>Emotions</dt><dd id="previewEmotions" class="is-empty">Off</dd></div>
+            <div><dt>Idea</dt><dd id="previewIdea" class="is-empty">—</dd></div>
+          </dl>
+
+          <div class="preview-credit">
+            <span>Estimated credits</span>
+            <strong><span id="previewCredit">17</span><span class="unit">credits</span></strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ============================================================
+         RESULT PANEL
+         ============================================================ -->
+    <div class="result-panel" id="resultPanel" aria-live="polite">
+      <div class="result-head">
+        <span>Script result</span>
+        <div class="result-tools">
+          <button class="btn btn-ghost btn-sm" id="copyBtn" type="button" disabled>Copy</button>
+          <button class="btn btn-ghost btn-sm" id="downloadBtn" type="button" disabled>Download .txt</button>
+          <button class="btn btn-ghost btn-sm" id="regenerateBtn" type="button" disabled>Regenerate</button>
+          <button class="btn btn-ghost btn-sm" id="clearBtn" type="button" disabled>Clear</button>
+        </div>
+      </div>
+
+      <div class="result-body">
+
+        <!-- Empty state -->
+        <div class="result-state result-empty" id="resultEmpty">
+          <p>Your generated script will appear here once a secure backend endpoint is connected.</p>
+          <button class="link-btn" id="demoBtn" type="button">Load demo script (layout preview only)</button>
+        </div>
+
+        <!-- Loading state -->
+        <div class="result-state result-loading" id="resultLoading" hidden>
+          <span class="spinner-lg" aria-hidden="true"></span>
+          <span>Preparing your script…</span>
+        </div>
+
+        <!-- Error state -->
+        <div class="result-state result-error" id="resultError" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 8v5M12 16.5v.01"/>
+          </svg>
+          <span id="resultErrorText"></span>
+        </div>
+
+        <!-- Done state -->
+        <div class="result-state result-done" id="resultDone" hidden>
+          <div class="result-meta">
+            <span id="resultWordCount">0 words</span>
+            <span class="dot">·</span>
+            <span id="resultTypeLabel">Moral Story</span>
+            <span class="badge-demo" id="resultDemoBadge" hidden>Demo output</span>
+          </div>
+          <pre class="result-text" id="resultText"></pre>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="shell footer-inner">
+
+    <a class="brand" href="index.html" aria-label="Aavora.art — home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 18L12 5l7 13"/><path d="M8.5 14h7"/></svg>
+      </span>
+      <span>aavora<span class="brand-dot">.art</span></span>
+    </a>
+
+    <nav class="footer-links" aria-label="Footer">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <p class="footer-copy">© <span id="year">2025</span> Aavora.art</p>
+
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+     HELPERS
+     ============================================================ */
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+  function truncate(str, n) {
+    str = (str || '').trim();
+    if (!str) return '';
+    return str.length > n ? str.slice(0, n).trim() + '…' : str;
+  }
+
+  /* ============================================================
+     HEADER — MOBILE NAV + SCROLL STATE
+     ============================================================ */
+  var navToggle = $('#navToggle');
+  var mobileNav = $('#mobileNav');
+
+  function closeMobileNav() {
+    mobileNav.classList.remove('is-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  navToggle.addEventListener('click', function () {
+    var open = mobileNav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeMobileNav();
+  });
+
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 880) closeMobileNav();
+  });
+
+  $$('a', mobileNav).forEach(function (link) {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  var header = $('#siteHeader');
+  function onScroll() {
+    header.classList.toggle('is-scrolled', window.scrollY > 8);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ============================================================
+     TOAST
+     ============================================================ */
+  var toastEl = $('#toast');
+  var toastTimer = null;
+
+  function showToast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add('is-visible');
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(function () {
+      toastEl.classList.remove('is-visible');
+    }, 4600);
+  }
+
+  /* ============================================================
+     GOOGLE AUTH PLACEHOLDER
+     ============================================================ */
+  $$('[data-auth]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      showToast(
+        'Google Sign-In is not connected yet. Authentication will be enabled ' +
+        'once Firebase Authentication is configured.'
+      );
+    });
+  });
+
+  /* ============================================================
+     SCRIPT STUDIO — CONFIG
+     ============================================================ */
+  var SCRIPT_CONFIG = {
+    types: [
+      { id:'moral',  label:'Moral Story',  desc:'A lesson wrapped in a narrative', icon:'book' },
+      { id:'horror', label:'Horror Story', desc:'Dread, tension and the unknown',  icon:'moon' },
+      { id:'food',   label:'Food Story',   desc:'Culinary journeys and flavour',   icon:'bowl' }
+    ],
+    languages: [
+      { id:'hindi',    label:'Hindi (Devanagari)' },
+      { id:'hinglish', label:'Hinglish' },
+      { id:'english',  label:'English' }
+    ],
+    lengths: [
+      { id:'5',  label:'5 minutes',  min:600,  max:750  },
+      { id:'10', label:'10 minutes', min:1200, max:1500 },
+      { id:'15', label:'15 minutes', min:1800, max:2250 },
+      { id:'20', label:'20 minutes', min:2400, max:3000 }
+    ],
+    emotions: [
+      'Happy', 'Sad', 'Angry', 'Fear',
+      'Suspense', 'Love', 'Mystery', 'Inspirational'
+    ],
+    credits: {
+      base: 5,
+      perMinute: 2,
+      perEmotion: 1,
+      perExtraCharacter: 1
+    }
+  };
+
+  var ICONS = {
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v18H6.5A2.5 2.5 0 014 18.5z"/><path d="M4 18.5A2.5 2.5 0 016.5 16H20"/></svg>',
+    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>',
+    bowl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18"/><path d="M5 11a7 7 0 0114 0"/><path d="M4 15h16l-1.5 4.5a2 2 0 01-1.9 1.5H7.4a2 2 0 01-1.9-1.5z"/><path d="M9 7V4M15 7V4"/></svg>'
+  };
+
+  /* ============================================================
+     SCRIPT STUDIO — STATE
+     ============================================================ */
+  var state = {
+    type: 'moral',
+    language: 'english',
+    length: '5',
+    characters: '3',
+    emotionsOn: false,
+    emotions: [],
+    idea: ''
+  };
+
+  /* ============================================================
+     SCRIPT STUDIO — ELEMENT REFS
+     ============================================================ */
+  var typeGrid       = $('#typeGrid');
+  var langSelect     = $('#scriptLanguage');
+  var lengthSelect   = $('#scriptLength');
+  var charSelect     = $('#scriptCharacters');
+  var lengthHint     = $('#lengthHint');
+  var characterHint  = $('#characterHint');
+
+  var emotionToggle  = $('#emotionToggle');
+  var emotionBody    = $('#emotionBody');
+  var emotionTagsEl  = $('#emotionTags');
+  var emotionHint    = $('#emotionHint');
+  var moodPreviewCode = $('#moodPreviewCode');
+
+  var ideaInput      = $('#storyIdea');
+  var ideaCount      = $('#ideaCount');
+  var ideaField      = $('#ideaField');
+
+  var generateBtn    = $('#generateBtn');
+  var creditValue    = $('#creditValue');
+
+  var previewType       = $('#previewType');
+  var previewLanguage   = $('#previewLanguage');
+  var previewLength     = $('#previewLength');
+  var previewWords      = $('#previewWords');
+  var previewCharacters = $('#previewCharacters');
+  var previewEmotions   = $('#previewEmotions');
+  var previewIdea       = $('#previewIdea');
+  var previewCredit     = $('#previewCredit');
+  var previewReady      = $('#previewReady');
+
+  var resultEmpty     = $('#resultEmpty');
+  var resultLoading   = $('#resultLoading');
+  var resultError     = $('#resultError');
+  var resultErrorText = $('#resultErrorText');
+  var resultDone      = $('#resultDone');
+  var resultText      = $('#resultText');
+  var resultWordCount = $('#resultWordCount');
+  var resultTypeLabel = $('#resultTypeLabel');
+  var resultDemoBadge = $('#resultDemoBadge');
+
+  var copyBtn       = $('#copyBtn');
+  var downloadBtn   = $('#downloadBtn');
+  var regenerateBtn = $('#regenerateBtn');
+  var clearBtn      = $('#clearBtn');
+  var demoBtn       = $('#demoBtn');
+
+  /* ============================================================
+     SCRIPT STUDIO — BUILD CONTROLS
+     ============================================================ */
+  function buildTypeCards() {
+    typeGrid.innerHTML = SCRIPT_CONFIG.types.map(function (t) {
+      var selected = state.type === t.id;
+      return (
+        '<button class="type-card' + (selected ? ' is-selected' : '') + '" ' +
+          'type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" ' +
+          'data-type="' + t.id + '">' +
+          '<span class="type-icon" aria-hidden="true">' + (ICONS[t.icon] || '') + '</span>' +
+          '<span class="type-info">' +
+            '<span class="type-label">' + escapeHtml(t.label) + '</span>' +
+            '<span class="type-desc">' + escapeHtml(t.desc) + '</span>' +
+          '</span>' +
+          '<span class="type-check" aria-hidden="true">' +
+            '<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>' +
+          '</span>' +
+        '</button>'
+      );
+    }).join('');
+  }
+
+  function buildCharacterOptions() {
+    var html = '<option value="narrator">Narrator only (voice-over)</option>';
+    for (var i = 1; i <= 15; i++) {
+      html += '<option value="' + i + '">' + i + ' character' + (i > 1 ? 's' : '') + '</option>';
+    }
+    charSelect.innerHTML = html;
+    charSelect.value = state.characters;
+  }
+
+  function buildEmotionTags() {
+    emotionTagsEl.innerHTML = SCRIPT_CONFIG.emotions.map(function (e) {
+      var selected = state.emotions.indexOf(e) !== -1;
+      return (
+        '<button class="chip' + (selected ? ' is-selected' : '') + '" type="button" ' +
+          'data-emotion="' + escapeHtml(e) + '" ' +
+          'aria-pressed="' + (selected ? 'true' : 'false') + '">' +
+          escapeHtml(e) +
+        '</button>'
+      );
+    }).join('');
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — DERIVED VALUES
+     ============================================================ */
+  function getType() {
+    return SCRIPT_CONFIG.types.filter(function (t) { return t.id === state.type; })[0] ||
+           SCRIPT_CONFIG.types[0];
+  }
+  function getLength() {
+    return SCRIPT_CONFIG.lengths.filter(function (l) { return l.id === state.length; })[0] ||
+           SCRIPT_CONFIG.lengths[0];
+  }
+  function getLanguageLabel() {
+    var lang = SCRIPT_CONFIG.languages.filter(function (l) { return l.id === state.language; })[0];
+    return lang ? lang.label : 'English';
+  }
+  function getCharacterLabel() {
+    if (state.characters === 'narrator') return 'Narrator only';
+    var n = parseInt(state.characters, 10) || 1;
+    return n + ' character' + (n > 1 ? 's' : '');
+  }
+  function getActiveEmotions() {
+    return state.emotionsOn ? state.emotions.slice() : [];
+  }
+  function calculateCredits() {
+    var cfg = SCRIPT_CONFIG.credits;
+    var minutes = parseInt(state.length, 10) || 0;
+    var emotions = getActiveEmotions().length;
+    var charCount = state.characters === 'narrator' ? 0 : (parseInt(state.characters, 10) || 0);
+    var extraChars = Math.max(0, charCount - 1);
+    return cfg.base + (cfg.perMinute * minutes) +
+           (cfg.perEmotion * emotions) +
+           (cfg.perExtraCharacter * extraChars);
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — RENDER
+     ============================================================ */
+  function renderPreview() {
+    var type = getType();
+    var len = getLength();
+    var emotions = getActiveEmotions();
+
+    previewType.textContent = type.label;
+    previewLanguage.textContent = getLanguageLabel();
+    previewLength.textContent = len.label;
+    previewWords.textContent = len.min + '–' + len.max + ' words';
+    previewCharacters.textContent = getCharacterLabel();
+
+    if (!state.emotionsOn) {
+      previewEmotions.textContent = 'Off';
+      previewEmotions.classList.add('is-empty');
+    } else if (!emotions.length) {
+      previewEmotions.textContent = 'On · none selected';
+      previewEmotions.classList.add('is-empty');
+    } else {
+      previewEmotions.textContent = emotions.join(', ');
+      previewEmotions.classList.remove('is-empty');
+    }
+
+    if (state.idea.trim()) {
+      previewIdea.textContent = truncate(state.idea, 70);
+      previewIdea.classList.remove('is-empty');
+    } else {
+      previewIdea.textContent = '—';
+      previewIdea.classList.add('is-empty');
+    }
+
+    var credits = calculateCredits();
+    creditValue.textContent = credits;
+    previewCredit.textContent = credits;
+
+    var ready = state.idea.trim().length >= 10;
+    previewReady.textContent = ready ? 'Ready' : 'Needs an idea';
+    previewReady.classList.toggle('is-ready', ready);
+  }
+
+  function renderHints() {
+    var len = getLength();
+    lengthHint.textContent = 'Target: ' + len.min + '–' + len.max + ' words';
+    characterHint.textContent = getCharacterLabel();
+    ideaCount.textContent = state.idea.length;
+
+    if (state.emotionsOn) {
+      emotionHint.textContent = 'Select the emotional beats the script should hit.';
+    } else {
+      emotionHint.textContent = 'Turn on to tag the emotional beats the script should hit.';
+    }
+  }
+
+  function renderMoodPreview() {
+    if (!state.emotionsOn) {
+      moodPreviewCode.textContent = '[Mood: —]';
+      return;
+    }
+    if (!state.emotions.length) {
+      moodPreviewCode.textContent = '[Mood: none selected]';
+      return;
+    }
+    moodPreviewCode.textContent = '[Mood: ' + state.emotions.join(' · ') + ']';
+  }
+
+  function renderEmotionVisibility() {
+    emotionBody.hidden = !state.emotionsOn;
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — RESULT STATE
+     ============================================================ */
+  function showResultState(name) {
+    resultEmpty.hidden   = name !== 'empty';
+    resultLoading.hidden = name !== 'loading';
+    resultError.hidden   = name !== 'error';
+    resultDone.hidden    = name !== 'done';
+
+    var hasText = name === 'done';
+    copyBtn.disabled       = !hasText;
+    downloadBtn.disabled   = !hasText;
+    regenerateBtn.disabled = name === 'loading';
+    clearBtn.disabled      = name === 'empty';
+  }
+
+  function showResultError(message) {
+    resultErrorText.textContent = message;
+    showResultState('error');
+  }
+
+  function clearResult() {
+    resultText.textContent = '';
+    resultWordCount.textContent = '0 words';
+    resultDemoBadge.hidden = true;
+    showResultState('empty');
+  }
+
+  function setResultText(text, opts) {
+    opts = opts || {};
+    text = String(text || '');
+    resultText.textContent = text;
+
+    var words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    resultWordCount.textContent = words + (words === 1 ? ' word' : ' words');
+    resultTypeLabel.textContent = getType().label;
+    resultDemoBadge.hidden = !opts.isDemo;
+
+    showResultState('done');
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — GENERATE FLOW
+     ============================================================ */
+  var isGenerating = false;
+
+  function setLoading(on) {
+    generateBtn.classList.toggle('is-loading', on);
+    generateBtn.disabled = on;
+    var label = generateBtn.querySelector('.btn-label');
+    if (label) label.textContent = on ? 'Generating…' : 'Generate script';
+  }
+
+  function handleGenerate() {
+    if (isGenerating) return;
+
+    ideaField.classList.remove('has-error');
+
+    if (state.idea.trim().length < 10) {
+      ideaField.classList.add('has-error');
+      showResultError(
+        'Please describe your story idea first — at least 10 characters ' +
+        'so the model has something to work with.'
+      );
+      ideaInput.focus();
+      ideaInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    isGenerating = true;
+    setLoading(true);
+    showResultState('loading');
+
+    /* ----------------------------------------------------------
+       BACKEND HOOK
+       ----------------------------------------------------------
+       Replace this timeout with a real fetch() to your secure
+       backend endpoint. Never call a third-party AI API directly
+       from this file, and never put API keys here.
+
+       Example shape:
+
+         fetch('/api/script', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ ...state })
+         })
+         .then(r => r.json())
+         .then(data => { isGenerating = false; setLoading(false);
+                         setResultText(data.script); })
+         .catch(() => { isGenerating = false; setLoading(false);
+                        showResultError('The script service is unavailable.'); });
+       ---------------------------------------------------------- */
+
+    window.setTimeout(function () {
+      isGenerating = false;
+      setLoading(false);
+      showResultError(
+        'AI generation is not connected yet. Connect a secure backend ' +
+        'endpoint to generate real scripts. You can still load a demo ' +
+        'script above to preview the result layout.'
+      );
+      showToast('AI generation is not connected yet.');
+    }, 1400);
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — DEMO SCRIPT (clearly labelled)
+     ============================================================ */
+  function loadDemoScript() {
+    var type = getType();
+    var len = getLength();
+    var emotions = getActiveEmotions();
+
+    var header =
+      'Mood: ' + (emotions.length ? emotions.join(' · ') : 'Neutral') + '\n' +
+      'Type: ' + type.label + '\n' +
+      'Language: ' + getLanguageLabel() + '\n' +
+      'Target length: ' + len.min + '–' + len.max + ' words\n' +
+      'Characters: ' + getCharacterLabel() + '\n' +
+      '---\n\n';
+
+    var body =
+      'This is a demo script placeholder.\n\n' +
+      'It exists only to preview how a real generated script will be ' +
+      'displayed inside the result panel. No AI model was called.\n\n' +
+      'Your idea was:\n' +
+      '  "' + (state.idea.trim() || 'No idea entered.') + '"\n\n' +
+      'Once a secure backend endpoint is connected, a real script for this ' +
+      'setup will replace this demo text.';
+
+    setResultText(header + body, { isDemo: true });
+    showToast('Demo script loaded — this is not AI-generated.');
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — COPY / DOWNLOAD
+     ============================================================ */
+  function getDisplayedText() {
+    return resultText.textContent || '';
+  }
+
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showToast('Script copied to clipboard.');
+    } catch (e) {
+      showToast('Copy is not available in this browser.');
+    }
+    document.body.removeChild(ta);
+  }
+
+  function copyResult() {
+    var text = getDisplayedText();
+    if (!text) return;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast('Script copied to clipboard.');
+      }).catch(function () {
+        legacyCopy(text);
+      });
+    } else {
+      legacyCopy(text);
+    }
+  }
+
+  function downloadResult() {
+    var text = getDisplayedText();
+    if (!text) return;
+
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'aavora-script.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Script downloaded as aavora-script.txt');
+  }
+
+  /* ============================================================
+     SCRIPT STUDIO — EVENT WIRING
+     ============================================================ */
+  typeGrid.addEventListener('click', function (e) {
+    var card = e.target.closest ? e.target.closest('.type-card') : null;
+    if (!card) return;
+
+    state.type = card.getAttribute('data-type');
+
+    $$('.type-card', typeGrid).forEach(function (el) {
+      var on = el === card;
+      el.classList.toggle('is-selected', on);
+      el.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+
+    renderPreview();
+  });
+
+  langSelect.addEventListener('change', function () {
+    state.language = langSelect.value;
+    renderPreview();
+  });
+
+  lengthSelect.addEventListener('change', function () {
+    state.length = lengthSelect.value;
+    renderHints();
+    renderPreview();
+  });
+
+  charSelect.addEventListener('change', function () {
+    state.characters = charSelect.value;
+    renderHints();
+    renderPreview();
+  });
+
+  emotionToggle.addEventListener('change', function () {
+    state.emotionsOn = emotionToggle.checked;
+    renderEmotionVisibility();
+    renderHints();
+    renderPreview();
+    renderMoodPreview();
+  });
+
+  emotionTagsEl.addEventListener('click', function (e) {
+    var chip = e.target.closest ? e.target.closest('.chip') : null;
+    if (!chip) return;
+
+    var value = chip.getAttribute('data-emotion');
+    var index = state.emotions.indexOf(value);
+
+    if (index === -1) state.emotions.push(value);
+    else state.emotions.splice(index, 1);
+
+    var on = state.emotions.indexOf(value) !== -1;
+    chip.classList.toggle('is-selected', on);
+    chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+
+    renderPreview();
+    renderMoodPreview();
+  });
+
+  ideaInput.addEventListener('input', function () {
+    state.idea = ideaInput.value;
+    ideaField.classList.remove('has-error');
+    renderHints();
+    renderPreview();
+  });
+
+  $('#scriptForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    handleGenerate();
+  });
+
+  copyBtn.addEventListener('click', copyResult);
+  downloadBtn.addEventListener('click', downloadResult);
+  demoBtn.addEventListener('click', loadDemoScript);
+
+  regenerateBtn.addEventListener('click', function () {
+    if (resultDemoBadge.hidden === false) {
+      showToast('Demo scripts cannot be regenerated. Connect the backend first.');
+      return;
+    }
+    showResultState('empty');
+  });
+
+  clearBtn.addEventListener('click', function () {
+    clearResult();
+    showToast('Result cleared.');
+  });
+
+  /* ============================================================
+     SCRIPT STUDIO — BOOT
+     ============================================================ */
+  buildTypeCards();
+  buildCharacterOptions();
+  buildEmotionTags();
+  renderEmotionVisibility();
+  renderHints();
+  renderPreview();
+  renderMoodPreview();
+  showResultState('empty');
+
+  /* ============================================================
+     FOOTER YEAR
+     ============================================================ */
+  $('#year').textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>
