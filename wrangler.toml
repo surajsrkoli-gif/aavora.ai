@@ -1,16 +1,12 @@
-name = "aavora-worker"
+
+name = "aavora-ai-backend"
 main = "worker.js"
 compatibility_date = "2024-09-23"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "aavora-db"
-database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
-
-# ── Rate limiting (native Cloudflare Workers binding) ──────────────
-# Free-tier compatible. `period` must be 10 or 60 seconds.
-# Limits are approximate per Cloudflare location; see:
-# https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/
+database_id = "50eaffe1-adb6-44f4-9105-5a04b5b44d8b"
 
 [[ratelimits]]
 name = "ORDER_RATE_LIMITER"
@@ -28,7 +24,5 @@ namespace_id = "1003"
 simple = { limit = 3, period = 60 }
 
 [vars]
-# Exact production origin(s). Never use "*" with credentials.
 ALLOWED_ORIGIN = "https://aavora.art"
-# Optional second origin (e.g. www). Leave empty if unused.
 ALLOWED_ORIGIN_2 = ""
