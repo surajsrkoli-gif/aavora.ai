@@ -1,133 +1,161 @@
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- AAVORA.ART — SAFE ADDITIVE MIGRATION
+-- Updated for the verified existing aavora-db schema
 --
 -- IMPORTANT:
--- 1. Run every SQL statement ONE AT A TIME in Cloudflare D1 Console.
--- 2. Run STEP 1 and STEP 0b first. Do not run STEP 2 onward until cleared.
--- 3. Never skip an error unless it is a verified duplicate-column or
---    already-exists condition.
--- 4. No DROP TABLE, DROP COLUMN, or DELETE of existing data.
--- 5. Take a restorable backup before making any production changes.
+-- 1. Run statements ONE AT A TIME in Cloudflare D1 Console.
+-- 2. Run STEP 1 and STEP 0b first.
+-- 3. Do not run STEP 2 onward until all STOP checks are clear.
+-- 4. Never ignore an unexpected SQL error.
+-- 5. No DROP TABLE, DROP COLUMN, or DELETE of existing records.
+-- 6. Keep the Time Travel recovery Bookmark ID saved.
 -- ═══════════════════════════════════════════════════════════════════════
 
 
 -- ─── STEP 1 — DIAGNOSTICS (READ ONLY) ─────────────────────────────────
 
-SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;
+SELECT name
+FROM sqlite_master
+WHERE type = 'table'
+ORDER BY name;
 
 PRAGMA table_info(products);
 PRAGMA table_info(orders);
 PRAGMA table_info(order_items);
-PRAGMA table_info(categories);
 PRAGMA table_info(admin_users);
 PRAGMA table_info(admin_sessions);
 PRAGMA table_info(product_reviews);
 PRAGMA table_info(order_status_history);
 
-SELECT 'products' AS tbl, COUNT(*) AS n FROM products
-UNION ALL SELECT 'orders', COUNT(*) FROM orders
-UNION ALL SELECT 'order_items', COUNT(*) FROM order_items
-UNION ALL SELECT 'categories', COUNT(*) FROM categories;
+-- Record these BEFORE counts separately.
 
--- Save these results as BEFORE counts.
+SELECT COUNT(*) AS products_before FROM products;
+
+SELECT COUNT(*) AS orders_before FROM orders;
+
+SELECT COUNT(*) AS order_items_before FROM order_items;
+
+SELECT COUNT(*) AS admin_users_before FROM admin_users;
+
+SELECT COUNT(*) AS admin_sessions_before FROM admin_sessions;
 
 
--- ─── STEP 0b — HAZARD DETECTION (READ ONLY) ────────────────────────────
--- Run every SELECT below separately.
--- Any STOP-level result means STOP. Do not run STEP 2 onward.
+-- ─── STEP 0b-A — INCOMPATIBLE EXISTING COLUMN TYPES ───────────────────
+-- Any returned row = STOP.
 
-
--- 0b-A — Incompatible existing column types
-
-SELECT 'H1-incompatible-type' AS hazard,
-       'product_reviews' AS tbl, name, type AS actual
+SELECT
+  'H1-incompatible-type' AS hazard,
+  'product_reviews' AS tbl,
+  name,
+  type AS actual
 FROM pragma_table_info('product_reviews')
 WHERE
-  (name IN ('id','product_id','reviewer_name','review_text','review_date')
-   AND type <> ''
-   AND type NOT LIKE '%CHAR%'
-   AND type NOT LIKE '%TEXT%'
-   AND type NOT LIKE '%CLOB%')
+  (
+    name IN ('id','product_id','reviewer_name','review_text','review_date')
+    AND type <> ''
+    AND type NOT LIKE '%CHAR%'
+    AND type NOT LIKE '%TEXT%'
+    AND type NOT LIKE '%CLOB%'
+  )
   OR
-  (name IN ('rating','is_visible','created_at','updated_at')
-   AND type <> '' AND type NOT LIKE '%INT%')
+  (
+    name IN ('rating','is_visible','created_at','updated_at')
+    AND type <> ''
+    AND type NOT LIKE '%INT%'
+  )
 
 UNION ALL
 
-SELECT 'H1-incompatible-type',
-       'order_status_history', name, type
+SELECT
+  'H1-incompatible-type',
+  'order_status_history',
+  name,
+  type
 FROM pragma_table_info('order_status_history')
 WHERE
-  (name IN ('id','order_id','status','note')
-   AND type <> ''
-   AND type NOT LIKE '%CHAR%'
-   AND type NOT LIKE '%TEXT%'
-   AND type NOT LIKE '%CLOB%')
+  (
+    name IN ('id','order_id','status','note')
+    AND type <> ''
+    AND type NOT LIKE '%CHAR%'
+    AND type NOT LIKE '%TEXT%'
+    AND type NOT LIKE '%CLOB%'
+  )
   OR
-  (name = 'changed_at' AND type <> '' AND type NOT LIKE '%INT%');
+  (
+    name = 'changed_at'
+    AND type <> ''
+    AND type NOT LIKE '%INT%'
+  );
 
 
--- 0b-B — Existing reviews/history tables must have id as PRIMARY KEY
+-- ─── STEP 0b-B — PRIMARY KEY CHECK ─────────────────────────────────────
+-- Existing reviews/history tables must have id as PRIMARY KEY.
 
-SELECT 'H2-missing-pk-on-id' AS hazard,
-       'product_reviews' AS tbl,
-       'table exists but id is not PRIMARY KEY' AS detail
+SELECT
+  'H2-missing-pk-on-id' AS hazard,
+  'product_reviews' AS tbl,
+  'id is not PRIMARY KEY' AS detail
 WHERE EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name='product_reviews'
+  WHERE type = 'table' AND name = 'product_reviews'
 )
 AND NOT EXISTS (
   SELECT 1 FROM pragma_table_info('product_reviews')
-  WHERE name='id' AND pk >= 1
+  WHERE name = 'id' AND pk >= 1
 )
 
 UNION ALL
 
-SELECT 'H2-missing-pk-on-id',
-       'order_status_history',
-       'table exists but id is not PRIMARY KEY'
+SELECT
+  'H2-missing-pk-on-id',
+  'order_status_history',
+  'id is not PRIMARY KEY'
 WHERE EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name='order_status_history'
+  WHERE type = 'table' AND name = 'order_status_history'
 )
 AND NOT EXISTS (
   SELECT 1 FROM pragma_table_info('order_status_history')
-  WHERE name='id' AND pk >= 1
+  WHERE name = 'id' AND pk >= 1
 );
 
 
--- 0b-C — Existing reviews/history tables must have an id column
+-- ─── STEP 0b-C — ID COLUMN CHECK ──────────────────────────────────────
 
-SELECT 'H3-id-column-missing' AS hazard,
-       'product_reviews' AS tbl,
-       'table exists but has no id column; ALTER cannot add a PK column' AS detail
+SELECT
+  'H3-id-column-missing' AS hazard,
+  'product_reviews' AS tbl,
+  'Existing table has no id column' AS detail
 WHERE EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name='product_reviews'
+  WHERE type = 'table' AND name = 'product_reviews'
 )
 AND NOT EXISTS (
   SELECT 1 FROM pragma_table_info('product_reviews')
-  WHERE name='id'
+  WHERE name = 'id'
 )
 
 UNION ALL
 
-SELECT 'H3-id-column-missing',
-       'order_status_history',
-       'table exists but has no id column; ALTER cannot add a PK column'
+SELECT
+  'H3-id-column-missing',
+  'order_status_history',
+  'Existing table has no id column'
 WHERE EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name='order_status_history'
+  WHERE type = 'table' AND name = 'order_status_history'
 )
 AND NOT EXISTS (
   SELECT 1 FROM pragma_table_info('order_status_history')
-  WHERE name='id'
+  WHERE name = 'id'
 );
 
 
--- 0b-D — Missing required CORE columns (STOP)
--- These columns are NOT added by this migration.
+-- ─── STEP 0b-D — REQUIRED CORE COLUMNS ─────────────────────────────────
+-- Missing required columns = STOP.
+-- categories is intentionally NOT required.
+-- products.category is the existing category field.
 
 WITH required_core(tbl, col) AS (
   VALUES
@@ -168,10 +196,6 @@ WITH required_core(tbl, col) AS (
     ('order_items','unit_price'),
     ('order_items','line_total'),
 
-    ('categories','id'),
-    ('categories','name'),
-    ('categories','slug'),
-
     ('admin_users','id'),
     ('admin_users','email'),
     ('admin_users','password_hash'),
@@ -183,51 +207,70 @@ WITH required_core(tbl, col) AS (
     ('admin_sessions','created_at')
 ),
 existing_cols(tbl, name) AS (
-  SELECT 'products', name FROM pragma_table_info('products')
-  UNION ALL SELECT 'orders', name FROM pragma_table_info('orders')
-  UNION ALL SELECT 'order_items', name FROM pragma_table_info('order_items')
-  UNION ALL SELECT 'categories', name FROM pragma_table_info('categories')
-  UNION ALL SELECT 'admin_users', name FROM pragma_table_info('admin_users')
-  UNION ALL SELECT 'admin_sessions', name FROM pragma_table_info('admin_sessions')
+  SELECT 'products', name
+  FROM pragma_table_info('products')
+
+  UNION ALL
+
+  SELECT 'orders', name
+  FROM pragma_table_info('orders')
+
+  UNION ALL
+
+  SELECT 'order_items', name
+  FROM pragma_table_info('order_items')
+
+  UNION ALL
+
+  SELECT 'admin_users', name
+  FROM pragma_table_info('admin_users')
+
+  UNION ALL
+
+  SELECT 'admin_sessions', name
+  FROM pragma_table_info('admin_sessions')
 )
 SELECT
   '0b-D' AS check_id,
   r.tbl,
   r.col AS missing_col,
-  'STOP: required core column missing; migration does NOT add it' AS status
+  'STOP: required core column missing' AS status
 FROM required_core r
 WHERE EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name=r.tbl
+  WHERE type = 'table' AND name = r.tbl
 )
 AND NOT EXISTS (
   SELECT 1 FROM existing_cols c
-  WHERE c.tbl=r.tbl AND c.name=r.col
+  WHERE c.tbl = r.tbl
+    AND c.name = r.col
 );
 
 
--- 0b-E — Missing required CORE tables (STOP)
+-- ─── STEP 0b-E — REQUIRED CORE TABLES ──────────────────────────────────
+-- categories is intentionally excluded.
 
-SELECT '0b-E' AS check_id,
-       t.tbl AS missing_table,
-       'STOP: required core table missing; migration does NOT create it' AS status
+SELECT
+  '0b-E' AS check_id,
+  t.tbl AS missing_table,
+  'STOP: required core table missing' AS status
 FROM (
   SELECT 'products' AS tbl
   UNION ALL SELECT 'orders'
   UNION ALL SELECT 'order_items'
-  UNION ALL SELECT 'categories'
   UNION ALL SELECT 'admin_users'
   UNION ALL SELECT 'admin_sessions'
 ) t
 WHERE NOT EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name=t.tbl
+  WHERE type = 'table' AND name = t.tbl
 );
 
 
--- 0b-F — Informational missing columns in reviews/history
--- These columns are added by STEP 3b and STEP 4.
--- Results here alone do NOT stop migration.
+-- ─── STEP 0b-F — INFORMATIONAL REVIEWS/HISTORY CHECK ──────────────────
+-- Missing columns are informational only.
+-- In the currently verified database, both tables are absent.
+-- STEP 3b and STEP 4 create them with their complete schema.
 
 WITH required_cols(tbl, col) AS (
   VALUES
@@ -250,7 +293,9 @@ WITH required_cols(tbl, col) AS (
 existing_cols(tbl, name) AS (
   SELECT 'product_reviews', name
   FROM pragma_table_info('product_reviews')
+
   UNION ALL
+
   SELECT 'order_status_history', name
   FROM pragma_table_info('order_status_history')
 )
@@ -258,43 +303,53 @@ SELECT
   '0b-F' AS check_id,
   r.tbl,
   r.col AS missing_col,
-  'INFO: migration adds this column' AS status
+  'INFO: table/column will be created by migration' AS status
 FROM required_cols r
 WHERE EXISTS (
   SELECT 1 FROM sqlite_master
-  WHERE type='table' AND name=r.tbl
+  WHERE type = 'table' AND name = r.tbl
 )
 AND NOT EXISTS (
   SELECT 1 FROM existing_cols c
-  WHERE c.tbl=r.tbl AND c.name=r.col
+  WHERE c.tbl = r.tbl
+    AND c.name = r.col
 );
 
 
 -- ─── STEP 0b STOP RULE ─────────────────────────────────────────────────
+--
 -- STOP if any rows appear in:
 -- H1, H2, H3, 0b-D, or 0b-E.
+--
 -- 0b-F is informational only.
--- Do not run STEP 2 until the STOP-level checks are clear.
+-- Do not run STEP 2 until STOP-level checks are clear.
 
 
--- ─── STEP 2 — PRODUCTS TABLE ALTERS ────────────────────────────────────
--- Run each ALTER separately.
+-- ─── STEP 2 — PRODUCTS TABLE ADDITIONS ─────────────────────────────────
+-- Run each statement separately.
+-- These columns were absent in the verified products schema.
 
-ALTER TABLE products ADD COLUMN sold_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE products
+ADD COLUMN sold_count INTEGER NOT NULL DEFAULT 0;
 
-ALTER TABLE products ADD COLUMN images TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE products
+ADD COLUMN images TEXT NOT NULL DEFAULT '[]';
 
-ALTER TABLE products ADD COLUMN archived_at INTEGER;
-
-
--- ─── STEP 3 — ORDERS TABLE ─────────────────────────────────────────────
-
-ALTER TABLE orders ADD COLUMN estimated_delivery TEXT;
+ALTER TABLE products
+ADD COLUMN archived_at INTEGER;
 
 
--- ─── STEP 3b — PRODUCT REVIEWS ─────────────────────────────────────────
--- Run CREATE first, then each ALTER separately.
--- If a column already exists, verify with PRAGMA before skipping its ALTER.
+-- ─── STEP 3 — ORDERS TABLE ADDITION ────────────────────────────────────
+-- estimated_delivery was absent in the verified orders schema.
+
+ALTER TABLE orders
+ADD COLUMN estimated_delivery TEXT;
+
+
+-- ─── STEP 3b — CREATE PRODUCT REVIEWS ──────────────────────────────────
+-- The table was confirmed absent in the current database.
+-- Do not run this CREATE if a new table has appeared since diagnostics:
+-- stop and inspect its schema first.
 
 CREATE TABLE IF NOT EXISTS product_reviews (
   id TEXT PRIMARY KEY,
@@ -308,45 +363,9 @@ CREATE TABLE IF NOT EXISTS product_reviews (
   updated_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
 
-ALTER TABLE product_reviews ADD COLUMN product_id TEXT NOT NULL DEFAULT '';
 
-ALTER TABLE product_reviews ADD COLUMN reviewer_name TEXT NOT NULL DEFAULT '';
-
-ALTER TABLE product_reviews ADD COLUMN rating INTEGER NOT NULL DEFAULT 5;
-
-ALTER TABLE product_reviews ADD COLUMN review_text TEXT NOT NULL DEFAULT '';
-
-ALTER TABLE product_reviews ADD COLUMN review_date TEXT NOT NULL DEFAULT '1970-01-01';
-
-ALTER TABLE product_reviews ADD COLUMN is_visible INTEGER NOT NULL DEFAULT 1;
-
-ALTER TABLE product_reviews ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0;
-
-ALTER TABLE product_reviews ADD COLUMN updated_at INTEGER NOT NULL DEFAULT 0;
-
-
--- Backfill only invalid timestamps; preserve existing non-zero values.
-
-UPDATE product_reviews
-SET created_at = COALESCE(
-  CASE
-    WHEN review_date IS NOT NULL
-      AND review_date <> ''
-      AND review_date <> '1970-01-01'
-    THEN CAST(strftime('%s', review_date) AS INTEGER)
-    ELSE NULL
-  END,
-  unixepoch()
-)
-WHERE created_at IS NULL OR created_at = 0;
-
-UPDATE product_reviews
-SET updated_at = created_at
-WHERE (updated_at IS NULL OR updated_at = 0)
-  AND created_at > 0;
-
-
--- ─── STEP 4 — ORDER STATUS HISTORY ─────────────────────────────────────
+-- ─── STEP 4 — CREATE ORDER STATUS HISTORY ──────────────────────────────
+-- The table was confirmed absent in the current database.
 
 CREATE TABLE IF NOT EXISTS order_status_history (
   id TEXT PRIMARY KEY,
@@ -354,30 +373,6 @@ CREATE TABLE IF NOT EXISTS order_status_history (
   status TEXT NOT NULL,
   note TEXT,
   changed_at INTEGER NOT NULL DEFAULT (unixepoch())
-);
-
-ALTER TABLE order_status_history ADD COLUMN order_id TEXT NOT NULL DEFAULT '';
-
-ALTER TABLE order_status_history ADD COLUMN status TEXT NOT NULL DEFAULT 'Pending';
-
-ALTER TABLE order_status_history ADD COLUMN note TEXT;
-
-ALTER TABLE order_status_history ADD COLUMN changed_at INTEGER NOT NULL DEFAULT 0;
-
-
--- Backfill only when a matching order has a valid created_at timestamp.
-
-UPDATE order_status_history
-SET changed_at = (
-  SELECT NULLIF(created_at, 0)
-  FROM orders
-  WHERE orders.id = order_status_history.order_id
-)
-WHERE (changed_at IS NULL OR changed_at = 0)
-AND EXISTS (
-  SELECT 1 FROM orders
-  WHERE orders.id = order_status_history.order_id
-    AND orders.created_at > 0
 );
 
 
@@ -390,8 +385,10 @@ CREATE INDEX IF NOT EXISTS idx_history_order
 ON order_status_history(order_id, changed_at);
 
 
--- ─── STEP 6 — BACKFILL ─────────────────────────────────────────────────
--- These statements are designed to be repeatable.
+-- ─── STEP 6 — SAFE BACKFILL ────────────────────────────────────────────
+
+-- Preserve existing images.
+-- Only fill images when currently empty.
 
 UPDATE products
 SET images = json_array(image_url)
@@ -399,7 +396,18 @@ WHERE image_url IS NOT NULL
   AND image_url <> ''
   AND (images IS NULL OR images = '[]');
 
-INSERT INTO order_status_history (id, order_id, status, note, changed_at)
+
+-- Add one initial history entry for each existing order
+-- that does not yet have a history entry.
+-- This adds history rows; it does not change existing orders.
+
+INSERT INTO order_status_history (
+  id,
+  order_id,
+  status,
+  note,
+  changed_at
+)
 SELECT
   lower(hex(randomblob(16))),
   o.id,
@@ -415,45 +423,57 @@ WHERE NOT EXISTS (
 
 
 -- ─── STEP 7 — VERIFICATION ─────────────────────────────────────────────
+-- Compare these counts with STEP 1 BEFORE counts.
 
-SELECT 'products' AS tbl, COUNT(*) AS n FROM products
-UNION ALL SELECT 'orders', COUNT(*) FROM orders
-UNION ALL SELECT 'order_items', COUNT(*) FROM order_items
-UNION ALL SELECT 'categories', COUNT(*) FROM categories;
+SELECT COUNT(*) AS products_after FROM products;
+
+SELECT COUNT(*) AS orders_after FROM orders;
+
+SELECT COUNT(*) AS order_items_after FROM order_items;
+
+SELECT COUNT(*) AS admin_users_after FROM admin_users;
+
+SELECT COUNT(*) AS admin_sessions_after FROM admin_sessions;
 
 PRAGMA table_info(products);
 PRAGMA table_info(orders);
 PRAGMA table_info(order_items);
-PRAGMA table_info(categories);
 PRAGMA table_info(admin_users);
 PRAGMA table_info(admin_sessions);
 PRAGMA table_info(product_reviews);
 PRAGMA table_info(order_status_history);
 
-SELECT COUNT(*) AS history_rows FROM order_status_history;
+SELECT COUNT(*) AS history_rows
+FROM order_status_history;
 
-SELECT COUNT(*) AS review_rows FROM product_reviews;
+SELECT COUNT(*) AS review_rows
+FROM product_reviews;
 
 
--- ─── FINAL STOP CONDITIONS ────────────────────────────────────────────
+-- ─── FINAL STOP CONDITIONS ─────────────────────────────────────────────
 --
 -- DO NOT DEPLOY worker.js unless all checks pass.
 --
 -- STOP if:
 -- 1. H1, H2, H3, 0b-D, or 0b-E returned any rows.
--- 2. STEP 1 vs STEP 7 counts decreased for products, orders,
---    order_items, or categories.
--- 3. Any required column is missing after migration.
--- 4. Any ALTER failed except a verified duplicate-column condition.
--- 5. Any CREATE failed except a verified already-exists condition.
--- 6. Any unexpected SQL error occurs.
+-- 2. Products, orders, or order_items counts decreased.
+-- 3. Admin users or admin sessions counts unexpectedly decreased.
+-- 4. Any required column is missing after migration.
+-- 5. Any ALTER failed unexpectedly.
+-- 6. Any CREATE or INDEX statement failed unexpectedly.
+-- 7. Any unexpected SQL error occurs.
 --
 -- 0b-F rows are informational only.
 --
--- The migration does not DROP tables or delete existing records.
--- STEP 6 adds history rows for old orders that have no history entry.
--- This is an additive data change.
+-- No existing products, orders, order_items, or admin records
+-- are intentionally deleted or replaced by this migration.
 --
--- Take a verified restorable backup before running migration.
+-- STEP 6 adds initial history entries for existing orders
+-- that do not already have a history entry.
+--
+-- categories is not created or required by this migration.
+-- Existing products.category remains the category field.
+--
+-- Keep the Time Travel Bookmark ID saved.
 -- If anything unexpected happens, STOP and request review.
 -- ═══════════════════════════════════════════════════════════════════════
