@@ -367,6 +367,8 @@ function validateOrderFields(b) {
 /* Public tracking */
 
 async function trackOrder(request, env, cors) {
+  if (!env.TRACKING_RATE_LIMITER)
+    return json({ error: 'Order tracking is temporarily unavailable. Please try again later.' }, 503, cors);
   const limited = await env.TRACKING_RATE_LIMITER.limit({ key: clientIp(request) });
   if (!limited.success) return json({ error: 'Too many requests. Please wait a minute.' }, 429, cors);
 
@@ -694,24 +696,8 @@ async function adminUpdateProduct(request, env, id, cors) {
     ).run();
   }
 
-  let oldImages = [];
-  try { oldImages = JSON.parse(existing.images || '[]'); } catch {}
-  const newSet = new Set(images);
-  const removedKeys = [];
-
-  for (const url of oldImages) {
-    if (newSet.has(url)) continue;
-    const k = extractImageKey(url);
-    if (k && k.startsWith(`products/${id}/`)) removedKeys.push(k);
-  }
-
-  if (env.PRODUCT_IMAGES && removedKeys.length) {
-    for (const k of removedKeys) {
-      try { await env.PRODUCT_IMAGES.delete(k); } catch {}
-    }
-  }
-
-  return json({ ok: true, cleaned_up: removedKeys.length }, 200, cors);
+  // ImageKit file IDs are not stored in the current schema; keep removed assets rather than deleting unsafely.
+  return json({ ok: true, cleaned_up: 0 }, 200, cors);
 }
 async function adminDeleteProduct(request, env, id, cors) {
   if (!(await requireAdmin(request, env)))
@@ -793,23 +779,7 @@ async function adminDeleteProduct(request, env, id, cors) {
     }
   } catch {}
 
-  let imagesToDelete = [];
-  try {
-    const arr = JSON.parse(existing.images || '[]');
-    if (Array.isArray(arr)) {
-      for (const url of arr) {
-        const k = extractImageKey(url);
-        if (k && k.startsWith(`products/${id}/`)) imagesToDelete.push(k);
-      }
-    }
-  } catch {}
-
-  if (env.PRODUCT_IMAGES && imagesToDelete.length) {
-    for (const k of imagesToDelete) {
-      try { await env.PRODUCT_IMAGES.delete(k); } catch {}
-    }
-  }
-
+  // Product images are retained in ImageKit; current DB schema stores URLs, not ImageKit file IDs.
   return json({ ok: true, deleted: true }, 200, cors);
 }
 
@@ -911,62 +881,28 @@ function validateProduct(b) {
 
 async function countProductImages(env, productId) {
   const product = await env.DB.prepare(
-    'SELECT images FROM products WHERE id = ?'
+    'SELECT image_url, images FROM products WHERE id = ?'
   ).bind(productId).first();
 
-  let savedTotal = 0;
-  const savedR2Keys = new Set();
-  const seenUrls = new Set();
-
+  const urls = new Set();
   if (product) {
+    if (typeof product.image_url === 'string' && product.image_url) urls.add(product.image_url);
     try {
       const arr = JSON.parse(product.images || '[]');
       if (Array.isArray(arr)) {
         for (const url of arr) {
-          if (typeof url !== 'string' || !url || seenUrls.has(url)) continue;
-          seenUrls.add(url);
-          savedTotal++;
-          const k = extractImageKey(url);
-          if (k && k.startsWith(`products/${productId}/`)) savedR2Keys.add(k);
+          if (typeof url === 'string' && url) urls.add(url);
         }
       }
     } catch {}
   }
-
-  const listedR2Keys = new Set();
-  let cursor;
-  let iterations = 0;
-  const MAX_ITERATIONS = 20;
-
-  while (iterations++ < MAX_ITERATIONS) {
-    const listed = await env.PRODUCT_IMAGES.list({
-      prefix: `products/${productId}/`,
-      limit: 1000,
-      cursor,
-    });
-    for (const obj of listed.objects) listedR2Keys.add(obj.key);
-    if (!listed.truncated) break;
-    cursor = listed.cursor;
-  }
-
-  if (iterations >= MAX_ITERATIONS) {
-    console.warn('R2_LIST_LIMIT_REACHED',
-      JSON.stringify({ productId, iterations }));
-  }
-
-  let pending = 0;
-  for (const key of listedR2Keys) {
-    if (!savedR2Keys.has(key)) pending++;
-  }
-
-  return { saved: savedTotal, pending, total: savedTotal + pending };
+  return { saved: urls.size, pending: 0, total: urls.size };
 }
-
 async function adminUploadImage(request, env, productId, cors) {
   if (!(await requireAdmin(request, env)))
     return json({ error: 'Unauthorized' }, 401, cors);
-  if (!env.PRODUCT_IMAGES)
-    return json({ error: 'R2 not configured. See deployment guide.' }, 503, cors);
+  if (!env.IMAGEKIT_PRIVATE_KEY || !env.IMAGEKIT_URL_ENDPOINT)
+    return json({ error: 'ImageKit is not configured. Check Worker secrets and variables.' }, 503, cors);
 
   const product = await env.DB.prepare(
     'SELECT id FROM products WHERE id = ?'
@@ -976,11 +912,8 @@ async function adminUploadImage(request, env, productId, cors) {
   const pre = await countProductImages(env, productId);
   if (pre.total >= 10) {
     return json({
-      error: `Maximum 10 images per product. Current count: ${pre.total} (${pre.saved} saved + ${pre.pending} pending). Save the product or remove images before uploading.`,
-      current: pre.total,
-      saved: pre.saved,
-      pending: pre.pending,
-      limit: 10,
+      error: `Maximum 10 images per product. Current saved count: ${pre.saved}.`,
+      current: pre.total, saved: pre.saved, pending: 0, limit: 10,
     }, 400, cors);
   }
 
@@ -991,43 +924,51 @@ async function adminUploadImage(request, env, productId, cors) {
   const file = formData.get('file');
   if (!file || typeof file === 'string')
     return json({ error: 'No file in request' }, 400, cors);
-  if (file.size > 5 * 1024 * 1024)
-    return json({ error: 'File too large. Maximum 5 MB per image.' }, 400, cors);
+  if (!file.size || file.size > 5 * 1024 * 1024)
+    return json({ error: 'File must be between 1 byte and 5 MB.' }, 400, cors);
 
   const buffer = await file.arrayBuffer();
   const detected = detectImageType(new Uint8Array(buffer.slice(0, 12)));
   if (!detected)
     return json({ error: 'Unsupported file type. Use JPG, PNG, or WebP.' }, 400, cors);
 
-  const extMap = {
-    'image/jpeg': 'jpg',
-    'image/png': 'png',
-    'image/webp': 'webp',
-  };
+  const extMap = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  const safeName = `product-${productId}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${extMap[detected]}`;
+  const outgoing = new FormData();
+  outgoing.append('file', new Blob([buffer], { type: detected }), safeName);
+  outgoing.append('fileName', safeName);
+  outgoing.append('folder', `/aavora/products/${productId}`);
+  outgoing.append('useUniqueFileName', 'true');
+  outgoing.append('overwriteFile', 'false');
 
-  const key = `products/${productId}/${Date.now()}-${crypto.randomUUID()}.${extMap[detected]}`;
-  await env.PRODUCT_IMAGES.put(key, buffer, {
-    httpMetadata: { contentType: detected },
-  });
-
-  const post = await countProductImages(env, productId);
-  if (post.total > 10) {
-    try { await env.PRODUCT_IMAGES.delete(key); } catch {}
-    return json({
-      error: `Maximum 10 images per product. Concurrent upload rejected. Current count: ${post.total - 1}.`,
-      current: post.total - 1,
-      limit: 10,
-    }, 400, cors);
+  const auth = btoa(`${env.IMAGEKIT_PRIVATE_KEY}:`);
+  let response;
+  try {
+    response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
+      method: 'POST',
+      headers: { Authorization: `Basic ${auth}` },
+      body: outgoing,
+    });
+  } catch {
+    return json({ error: 'Could not connect to ImageKit. Please retry.' }, 502, cors);
   }
 
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = typeof result.message === 'string' ? result.message : 'ImageKit upload failed';
+    return json({ error: message.slice(0, 240) }, response.status >= 500 ? 502 : 400, cors);
+  }
+  if (!result.url || !result.fileId)
+    return json({ error: 'ImageKit returned an incomplete upload response.' }, 502, cors);
+
   return json({
-    key,
-    url: `https://api.aavora.art/images/${key}`,
-    size: file.size,
+    key: result.fileId,
+    file_id: result.fileId,
+    url: result.url,
+    size: result.size || file.size,
     content_type: detected,
   }, 201, cors);
 }
-
 function detectImageType(bytes) {
   if (bytes.length < 12) return null;
   if (bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF)
@@ -1046,30 +987,31 @@ function detectImageType(bytes) {
 async function adminDeleteOrphanImage(request, env, productId, cors) {
   if (!(await requireAdmin(request, env)))
     return json({ error: 'Unauthorized' }, 401, cors);
-  if (!env.PRODUCT_IMAGES)
-    return json({ error: 'R2 not configured' }, 503, cors);
+  if (!env.IMAGEKIT_PRIVATE_KEY)
+    return json({ error: 'ImageKit is not configured.' }, 503, cors);
 
   const body = await request.json().catch(() => null);
-  if (!body || typeof body.key !== 'string')
-    return json({ error: 'key is required' }, 400, cors);
-  if (body.key.length > 500)
-    return json({ error: 'key too long' }, 400, cors);
-  if (!body.key.startsWith(`products/${productId}/`))
-    return json({ error: 'Key does not belong to this product' }, 400, cors);
+  if (!body || typeof body.key !== 'string' || !/^[A-Za-z0-9_-]{8,160}$/.test(body.key))
+    return json({ error: 'A valid ImageKit file ID is required.' }, 400, cors);
 
   const ref = await env.DB.prepare(
-    'SELECT COUNT(*) AS n FROM products WHERE images LIKE ?'
-  ).bind(`%${body.key}%`).first();
+    'SELECT COUNT(*) AS n FROM products WHERE images LIKE ? OR image_url LIKE ?'
+  ).bind(`%${body.key}%`, `%${body.key}%`).first();
+  if ((ref?.n ?? 0) > 0)
+    return json({ error: 'Image is referenced by a saved product; remove it from the product first.' }, 409, cors);
 
-  if ((ref?.n ?? 0) > 0) {
-    return json({
-      error: 'Image is referenced by a saved product; save the product without it to remove.',
-    }, 409, cors);
+  const auth = btoa(`${env.IMAGEKIT_PRIVATE_KEY}:`);
+  let response;
+  try {
+    response = await fetch(`https://api.imagekit.io/v1/files/${encodeURIComponent(body.key)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Basic ${auth}` },
+    });
+  } catch {
+    return json({ error: 'Could not connect to ImageKit.' }, 502, cors);
   }
-
-  try { await env.PRODUCT_IMAGES.delete(body.key); }
-  catch { return json({ error: 'Could not delete object' }, 500, cors); }
-
+  if (!response.ok && response.status !== 404)
+    return json({ error: 'ImageKit could not delete this image.' }, 502, cors);
   return json({ ok: true }, 200, cors);
 }
 /* Admin — orders */
