@@ -94,7 +94,13 @@ details summary { cursor:pointer; font-weight:600; }
           <input type="hidden" id="pf-id" />
           <div class="field full"><label>Product Name *</label><input id="pf-name" required maxlength="200" /></div>
           <div class="field full"><label>Description</label><textarea id="pf-description" rows="3" maxlength="2000"></textarea></div>
-          <div class="field full"><label>Image URL (HTTPS only — no file upload)</label>
+          <div class="field full">
+            <label>Product Images (JPG, PNG, WebP — max 5 MB each, up to 10 images)</label>
+            <input id="pf-files" type="file" accept="image/jpeg,image/png,image/webp" multiple />
+            <small style="color:var(--muted)">Images upload securely to ImageKit after you save the product. Existing images are shown below.</small>
+            <div id="pf-image-preview" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px"></div>
+          </div>
+          <div class="field full"><label>Optional external Image URL (HTTPS)</label>
             <input id="pf-image" type="url" placeholder="https://example.com/image.jpg" maxlength="500" /></div>
           <div class="field"><label>Category</label><input id="pf-category" value="General" maxlength="80" /></div>
           <div class="field"><label>Selling Price (₹) *</label>
@@ -163,6 +169,75 @@ async function api(path, opts = {}) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || 'Request failed');
   return data;
+}
+
+
+let _editingImages = [];
+let _selectedImageFiles = [];
+
+function renderImagePreview() {
+  const wrap = document.getElementById('pf-image-preview');
+  if (!wrap) return;
+  const saved = _editingImages.map((url, index) => `
+    <div style="width:104px;position:relative;border:1px solid var(--border);border-radius:8px;padding:5px">
+      <img src="${escapeHtml(url)}" alt="Product image ${index + 1}" style="width:92px;height:92px;object-fit:cover;border-radius:5px" />
+      <button type="button" class="btn btn-small btn-danger" data-remove-image="${index}" style="width:100%;margin-top:4px">Remove</button>
+    </div>`).join('');
+  const pending = _selectedImageFiles.map((file, index) => `
+    <div style="width:104px;border:1px dashed var(--border);border-radius:8px;padding:5px">
+      <div style="height:92px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;overflow-wrap:anywhere">${escapeHtml(file.name)}</div>
+      <button type="button" class="btn btn-small btn-danger" data-remove-file="${index}" style="width:100%;margin-top:4px">Remove</button>
+    </div>`).join('');
+  wrap.innerHTML = saved + pending || '<small style="color:var(--muted)">No images selected.</small>';
+}
+
+document.getElementById('pf-image-preview').addEventListener('click', (e) => {
+  const removeImage = e.target.closest('[data-remove-image]');
+  const removeFile = e.target.closest('[data-remove-file]');
+  if (removeImage) {
+    _editingImages.splice(Number(removeImage.dataset.removeImage), 1);
+    renderImagePreview();
+  }
+  if (removeFile) {
+    _selectedImageFiles.splice(Number(removeFile.dataset.removeFile), 1);
+    renderImagePreview();
+  }
+});
+
+document.getElementById('pf-files').addEventListener('change', (e) => {
+  const picked = Array.from(e.target.files || []);
+  for (const file of picked) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      showToast('Only JPG, PNG, or WebP images are allowed.', true);
+      continue;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast(`${file.name}: maximum file size is 5 MB.`, true);
+      continue;
+    }
+    if (_editingImages.length + _selectedImageFiles.length < 10)
+      _selectedImageFiles.push(file);
+    else {
+      showToast('Maximum 10 images per product.', true);
+      break;
+    }
+  }
+  e.target.value = '';
+  renderImagePreview();
+});
+
+async function uploadProductImage(productId, file) {
+  const form = new FormData();
+  form.append('file', file, file.name);
+  const res = await fetch(API_BASE + '/api/admin/products/' + encodeURIComponent(productId) + '/images', {
+    method: 'POST',
+    credentials: 'include',
+    body: form,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { showLogin(); throw new Error('Session expired. Please sign in again.'); }
+  if (!res.ok) throw new Error(data.error || 'Image upload failed');
+  return data.url;
 }
 
 function showLogin() {
@@ -292,7 +367,18 @@ function openProductForm(product) {
   document.getElementById('pf-id').value = product ? product.id : '';
   document.getElementById('pf-name').value = product ? product.name : '';
   document.getElementById('pf-description').value = product ? product.description : '';
-  document.getElementById('pf-image').value = product ? product.image_url : '';
+  document.getElementById('pf-image').value = product ? (product.image_url || '') : '';
+  _editingImages = [];
+  if (product) {
+    try {
+      const parsed = JSON.parse(product.images || '[]');
+      if (Array.isArray(parsed)) _editingImages = parsed.filter((u) => typeof u === 'string' && u);
+    } catch {}
+    if (!_editingImages.length && product.image_url) _editingImages = [product.image_url];
+  }
+  _selectedImageFiles = [];
+  document.getElementById('pf-files').value = '';
+  renderImagePreview();
   document.getElementById('pf-category').value = product ? product.category : 'General';
   document.getElementById('pf-price').value = product ? (product.selling_price / 100) : '';
   document.getElementById('pf-cost').value = product ? (product.supplier_cost / 100) : 0;
@@ -301,37 +387,62 @@ function openProductForm(product) {
   document.getElementById('pf-variants').value = variants.join(',');
   document.getElementById('pf-available').value = product && !product.is_available ? '0' : '1';
 }
-function closeProductForm() { document.getElementById('product-form-wrap').classList.add('hidden'); }
+function closeProductForm() { document.getElementById('product-form-wrap').classList.add('hidden'); _selectedImageFiles = []; }
 
 document.getElementById('product-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const errEl = document.getElementById('product-form-error');
   errEl.classList.add('hidden');
-  const id = document.getElementById('pf-id').value;
+  const submitButton = e.submitter || document.querySelector('#product-form button[type="submit"]');
+  submitButton.disabled = true;
+
+  let id = document.getElementById('pf-id').value;
   const variantsRaw = document.getElementById('pf-variants').value.trim();
   const variants = variantsRaw ? variantsRaw.split(',').map((v) => v.trim()).filter(Boolean) : [];
+  const externalUrl = document.getElementById('pf-image').value.trim();
   const payload = {
     name: document.getElementById('pf-name').value.trim(),
     description: document.getElementById('pf-description').value.trim(),
-    image_url: document.getElementById('pf-image').value.trim(),
+    image_url: _editingImages[0] || externalUrl,
+    images: _editingImages.slice(),
     category: document.getElementById('pf-category').value.trim() || 'General',
     selling_price: Math.round(Number(document.getElementById('pf-price').value) * 100),
     supplier_cost: Math.round(Number(document.getElementById('pf-cost').value) * 100),
     variants,
     is_available: document.getElementById('pf-available').value === '1',
   };
+
   try {
-    if (id) await api('/api/admin/products/' + id, { method: 'PUT', body: JSON.stringify(payload) });
-    else await api('/api/admin/products', { method: 'POST', body: JSON.stringify(payload) });
-    showToast(id ? 'Product updated' : 'Product created');
+    if (id) {
+      await api('/api/admin/products/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    } else {
+      const created = await api('/api/admin/products', { method: 'POST', body: JSON.stringify(payload) });
+      id = created.id;
+      document.getElementById('pf-id').value = id;
+    }
+
+    const uploaded = [];
+    for (const file of _selectedImageFiles) {
+      uploaded.push(await uploadProductImage(id, file));
+    }
+    const finalImages = [..._editingImages, ...uploaded].filter((url, index, arr) => arr.indexOf(url) === index).slice(0, 10);
+    if (uploaded.length || finalImages.length) {
+      payload.images = finalImages;
+      payload.image_url = finalImages[0] || externalUrl;
+      await api('/api/admin/products/' + id, { method: 'PUT', body: JSON.stringify(payload) });
+    }
+
+    showToast(id ? 'Product saved successfully' : 'Product created');
     closeProductForm();
+    _selectedImageFiles = [];
     loadProducts();
   } catch (err) {
-    errEl.textContent = err.message;
+    errEl.textContent = err.message + (id ? ' Product record may already be saved; retry image upload or save again.' : '');
     errEl.classList.remove('hidden');
+  } finally {
+    submitButton.disabled = false;
   }
 });
-
 /* ═══════════════ Orders ═══════════════ */
 async function loadOrders() {
   const wrap = document.getElementById('orders-list');
