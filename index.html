@@ -376,7 +376,19 @@ async function handlePlaceOrder(e) {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Could not place order');
 
-    state.lastOrder = { ...payload, order_id: data.order_id, total_amount: data.total_amount };
+    // Keep the locally displayed unit prices for the confirmation table.
+    // The Worker remains authoritative for order pricing and total_amount.
+    state.lastOrder = {
+      ...payload,
+      items: state.cart.map((i) => ({
+        product_name: i.name,
+        variant: i.variant,
+        quantity: i.quantity,
+        unit_price: i.unit_price
+      })),
+      order_id: data.order_id,
+      total_amount: data.total_amount
+    };
     state.cart = []; saveCart(); e.target.reset();
     showConfirmation(); showView('confirmation');
   } catch (err2) {
