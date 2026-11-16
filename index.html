@@ -43,6 +43,21 @@ main { max-width: 1200px; margin: 0 auto; padding: 32px 24px 64px; min-height: 6
 .product-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
   overflow: hidden; display: flex; flex-direction: column; }
 .product-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: var(--beige); display: block; }
+.product-image-link { display:block; width:100%; padding:0; border:0; background:transparent; cursor:pointer; }
+.product-name-link { padding:0; border:0; background:none; color:inherit; font:inherit; text-align:left; cursor:pointer; }
+.product-name-link:hover { color:var(--rose-dark); }
+.product-detail { max-width:1000px; margin:0 auto; }
+.product-detail-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:32px; align-items:start; }
+.product-detail-main-image { width:100%; aspect-ratio:1/1; object-fit:contain; background:var(--white); border:1px solid var(--border); border-radius:var(--radius); }
+.product-detail-thumbs { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.product-detail-thumb { width:72px; height:72px; border:2px solid var(--border); border-radius:8px; cursor:pointer; background:var(--white); padding:2px; }
+.product-detail-thumb.active { border-color:var(--rose); }
+.product-detail-info { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:24px; }
+.product-detail-info h1 { margin:0 0 8px; }
+.product-detail-description { color:var(--muted); white-space:pre-wrap; }
+.product-detail-price { color:var(--rose); font-size:1.7rem; font-weight:800; margin:16px 0; }
+.product-detail-actions { display:flex; flex-direction:column; gap:12px; margin-top:20px; }
+@media (max-width:700px) { .product-detail-layout { grid-template-columns:1fr; gap:18px; } .product-detail-info { padding:18px; } }
 .product-body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .product-name { font-size: 1.05rem; font-weight: 600; margin: 0; }
 .product-desc { font-size: 0.85rem; color: var(--muted); margin: 0; flex: 1;
@@ -136,6 +151,13 @@ footer .footer-brand { font-weight: 700; letter-spacing: 0.14em; color: var(--da
     </div>
     <h2 class="section-title" id="shop">Our Collection</h2>
     <div class="product-grid" id="product-grid"><p style="grid-column:1/-1;text-align:center;color:var(--muted)">Loading products…</p></div>
+  </section>
+
+  <section id="view-product" class="view" hidden>
+    <div class="product-detail">
+      <button class="back-btn" onclick="showView('home')">← Back to Collection</button>
+      <div id="product-detail-content"></div>
+    </div>
   </section>
 
   <section id="view-cart" class="view" hidden>
@@ -246,10 +268,12 @@ function renderProducts() {
       : `<input type="hidden" id="variant-${p.id}" value="${escapeHtml(variants[0])}" />`;
 
     return `<div class="product-card">
-      <img class="product-image" src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.name)}" loading="lazy"
-        onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22600%22><rect width=%22600%22 height=%22600%22 fill=%22%23E8DFD0%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22sans-serif%22 font-size=%2228%22 fill=%22%237A726B%22>AAVORA.ART</text></svg>'" />
+      <button class="product-image-link" type="button" data-view-product="${escapeHtml(p.id)}" aria-label="View ${escapeHtml(p.name)} details">
+        <img class="product-image" src="${escapeHtml(getProductImages(p)[0] || '')}" alt="${escapeHtml(p.name)}" loading="lazy"
+          onerror="this.onerror=null;this.style.visibility='hidden';" />
+      </button>
       <div class="product-body">
-        <h3 class="product-name">${escapeHtml(p.name)}</h3>
+        <h3 class="product-name"><button class="product-name-link" type="button" data-view-product="${escapeHtml(p.id)}">${escapeHtml(p.name)}</button></h3>
         <p class="product-desc">${escapeHtml(p.description)}</p>
         <div class="product-price">${formatINR(p.selling_price)}</div>
         <div class="product-controls">
@@ -260,6 +284,51 @@ function renderProducts() {
         </div>
       </div></div>`;
   }).join('');
+}
+
+function getProductImages(product) {
+  let images = [];
+  if (Array.isArray(product.images)) images = product.images;
+  else if (typeof product.images === 'string') {
+    try { const parsed = JSON.parse(product.images); if (Array.isArray(parsed)) images = parsed; } catch {}
+  }
+  if (!images.length && product.image_url) images = [product.image_url];
+  return [...new Set(images.filter((u) => typeof u === 'string' && /^https:\/\/.+/i.test(u)))];
+}
+
+function openProductDetail(productId) {
+  const product = state.products.find((p) => p.id === productId);
+  if (!product) { showToast('Product details are unavailable'); return; }
+  const images = getProductImages(product);
+  let variants = [];
+  try { variants = JSON.parse(product.variants || '[]'); } catch {}
+  if (!Array.isArray(variants) || !variants.length) variants = ['Default'];
+  const imageMarkup = images[0]
+    ? `<img id="product-detail-main-image" class="product-detail-main-image" src="${escapeHtml(images[0])}" alt="${escapeHtml(product.name)}" />`
+    : `<div class="product-detail-main-image" style="display:grid;place-items:center;color:var(--muted)">AAVORA.ART</div>`;
+  document.getElementById('product-detail-content').innerHTML = `
+    <div class="product-detail-layout">
+      <div>${imageMarkup}
+        <div class="product-detail-thumbs">${images.map((url, index) =>
+          `<button type="button" class="product-detail-thumb ${index === 0 ? 'active' : ''}" data-detail-image="${index}" aria-label="View product image ${index + 1}">
+            <img src="${escapeHtml(url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:6px" />
+          </button>`).join('')}</div>
+      </div>
+      <div class="product-detail-info">
+        <p style="color:var(--muted);margin:0 0 6px">${escapeHtml(product.category || 'Collection')}</p>
+        <h1>${escapeHtml(product.name)}</h1>
+        <div class="product-detail-price">${formatINR(product.selling_price)}</div>
+        <div class="product-detail-description">${escapeHtml(product.description || 'Discover this product from AAVORA.ART.')}</div>
+        <div class="product-detail-actions">
+          <div class="control-row"><label for="detail-variant">Variant</label>
+            <select id="detail-variant">${variants.map((v) => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('')}</select>
+          </div>
+          <div class="control-row"><label for="detail-qty">Quantity</label><input id="detail-qty" type="number" min="1" max="20" value="1" /></div>
+          <button class="btn btn-primary btn-block" type="button" id="detail-add-to-cart" data-product-id="${escapeHtml(product.id)}">Add to Cart</button>
+        </div>
+      </div>
+    </div>`;
+  showView('product');
 }
 
 function addToCart(productId, variant, quantity) {
@@ -376,16 +445,9 @@ async function handlePlaceOrder(e) {
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error || 'Could not place order');
 
-    // Keep the locally displayed unit prices for the confirmation table.
-    // The Worker remains authoritative for order pricing and total_amount.
     state.lastOrder = {
       ...payload,
-      items: state.cart.map((i) => ({
-        product_name: i.name,
-        variant: i.variant,
-        quantity: i.quantity,
-        unit_price: i.unit_price
-      })),
+      items: state.cart.map((i) => ({ product_name: i.name, variant: i.variant, quantity: i.quantity, unit_price: i.unit_price })),
       order_id: data.order_id,
       total_amount: data.total_amount
     };
@@ -449,6 +511,27 @@ document.getElementById('product-grid').addEventListener('click', (e) => {
   const q = parseInt(document.getElementById('qty-' + pid).value, 10) || 1;
   addToCart(pid, v, q);
 });
+document.getElementById('product-grid').addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-view-product]');
+  if (trigger) openProductDetail(trigger.dataset.viewProduct);
+});
+document.getElementById('product-detail-content').addEventListener('click', (e) => {
+  const thumb = e.target.closest('[data-detail-image]');
+  if (thumb) {
+    const pid = document.getElementById('detail-add-to-cart')?.dataset.productId;
+    const product = state.products.find((p) => p.id === pid);
+    const image = getProductImages(product || {})[Number(thumb.dataset.detailImage)];
+    if (image) {
+      document.getElementById('product-detail-main-image').src = image;
+      document.querySelectorAll('.product-detail-thumb').forEach((el) => el.classList.remove('active'));
+      thumb.classList.add('active');
+    }
+    return;
+  }
+  const add = e.target.closest('#detail-add-to-cart');
+  if (add) addToCart(add.dataset.productId, document.getElementById('detail-variant').value, document.getElementById('detail-qty').value);
+});
+
 document.getElementById('cart-content').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-remove]');
   if (btn) { const [pid, v] = btn.dataset.remove.split('::'); removeFromCart(pid, v); }
